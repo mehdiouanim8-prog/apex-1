@@ -74,12 +74,17 @@
   .tabs {
     display: flex; background: #0a0f18;
     border-bottom: 1px solid #111822;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
-    flex: 1; padding: 12px 4px; text-align: center;
-    color: #3a5a7a; font-size: 11px; letter-spacing: 1.5px;
+    flex: 1; min-width: 60px;
+    padding: 12px 8px; text-align: center;
+    color: #3a5a7a; font-size: 10px; letter-spacing: 1px;
     border-bottom: 2px solid transparent;
     cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
   }
   .tab.active {
     color: #00c8ff; border-bottom-color: #00c8ff;
@@ -380,7 +385,282 @@
   .toast.success { border-color: #00e07a; }
   .toast.error { border-color: #ff4466; }
 
-  /* ── LOADING SPINNER ── */
+  /* ── COIN DETAIL VIEW ── */
+  .detail-view {
+    position: absolute; inset: 0;
+    background: #07080d;
+    z-index: 500;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+  }
+  .detail-view.show { transform: translateX(0); }
+  .detail-header {
+    padding: 14px 16px 12px;
+    background: linear-gradient(135deg, #0a0f1a, #0d1525);
+    border-bottom: 1px solid #1a2f45;
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  .back-btn {
+    background: transparent; border: 1px solid #1e3550;
+    color: #5a8aaa; width: 36px; height: 36px;
+    border-radius: 50%; cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+  }
+  .detail-coin-info { flex: 1; }
+  .detail-coin-info .coin-name {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 18px; color: #e0eeff;
+    letter-spacing: 1px;
+  }
+  .detail-coin-info .coin-full {
+    color: #3a5a7a; font-size: 11px;
+  }
+  .detail-price-block {
+    text-align: right;
+  }
+  .detail-price {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 22px;
+  }
+  .detail-chg { font-size: 12px; font-weight: bold; }
+
+  .detail-body {
+    flex: 1; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .stat-box {
+    background: #0a1018; border: 1px solid #111822;
+    padding: 10px; border-radius: 4px;
+  }
+  .stat-box .label {
+    font-size: 9px; color: #3a5a7a; letter-spacing: 1.5px;
+    margin-bottom: 4px;
+  }
+  .stat-box .value {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    font-size: 14px; color: #e0eeff;
+  }
+
+  .detail-section {
+    margin-bottom: 14px;
+  }
+  .detail-section h3 {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 11px; color: #5a8aaa;
+    letter-spacing: 2px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .detail-section h3::before {
+    content: ''; width: 3px; height: 14px;
+    background: #00aaff; border-radius: 2px;
+  }
+
+  .chart-box {
+    background: #0a1018; border: 1px solid #111822;
+    padding: 10px; border-radius: 4px;
+    height: 160px; position: relative;
+  }
+  .timeframe-tabs {
+    display: flex; gap: 4px; margin-bottom: 8px;
+  }
+  .tf-btn {
+    background: #0a1018; border: 1px solid #111822;
+    color: #5a8aaa; padding: 4px 10px;
+    font-family: inherit; font-size: 10px;
+    cursor: pointer; border-radius: 3px;
+    flex: 1; letter-spacing: 1px;
+  }
+  .tf-btn.active {
+    color: #00c8ff; border-color: #00aaff;
+    background: rgba(0,170,255,0.08);
+  }
+
+  .news-card {
+    background: #0a1018; border: 1px solid #111822;
+    padding: 10px 12px; margin-bottom: 6px;
+    border-radius: 4px;
+    border-left: 3px solid #1a3050;
+  }
+  .news-card.bullish { border-left-color: #00e07a; }
+  .news-card.bearish { border-left-color: #ff4466; }
+  .news-card.neutral { border-left-color: #ffaa00; }
+  .news-card .title {
+    color: #e0eeff; font-size: 12px;
+    line-height: 1.5; margin-bottom: 4px;
+  }
+  .news-card .meta {
+    display: flex; gap: 8px; align-items: center;
+    font-size: 10px; color: #3a5a7a;
+  }
+  .news-card .impact {
+    font-size: 9px; padding: 1px 5px;
+    border: 1px solid currentColor;
+    letter-spacing: 1px;
+  }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(0,170,255,0.06), rgba(255,107,53,0.03));
+    border: 1px solid #1a3050;
+    padding: 12px; border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .quick-action {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-top: 12px;
+  }
+  .qa-btn {
+    padding: 12px; border: 1px solid;
+    background: transparent; cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 2px; border-radius: 4px;
+  }
+  .qa-btn.buy { color: #00e07a; border-color: #00e07a; }
+  .qa-btn.sell { color: #ff4466; border-color: #ff4466; }
+
+  .indicator-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #0d1520;
+    font-size: 11px;
+  }
+  .indicator-row:last-child { border-bottom: none; }
+  .indicator-row .ind-label { color: #5a8aaa; }
+  .indicator-row .ind-value {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    color: #e0eeff;
+  }
+
+  /* ── ALERTS ── */
+  .alert-card {
+    background: #0a1018; border: 1px solid #1a3050;
+    padding: 10px 12px; margin-bottom: 6px;
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 10px; align-items: center;
+    border-radius: 4px;
+  }
+  .alert-card.triggered {
+    border-color: #ffaa00;
+    background: rgba(255,170,0,0.06);
+  }
+  .alert-info .a-title {
+    font-size: 12px; color: #e0eeff;
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+  }
+  .alert-info .a-cond {
+    font-size: 10px; color: #5a8aaa;
+    margin-top: 2px;
+  }
+  .delete-btn {
+    background: transparent; border: 1px solid #ff446644;
+    color: #ff4466; width: 28px; height: 28px;
+    border-radius: 4px; cursor: pointer; font-size: 14px;
+  }
+
+  /* ── MARKET OVERVIEW ── */
+  .overview-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 14px;
+  }
+  .overview-box {
+    background: linear-gradient(135deg, #0a1520, #0d1a28);
+    border: 1px solid #1a3050;
+    padding: 12px; border-radius: 4px;
+  }
+  .overview-box .ov-label {
+    font-size: 9px; color: #5a8aaa;
+    letter-spacing: 1.5px; margin-bottom: 4px;
+  }
+  .overview-box .ov-value {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 18px; color: #e0eeff;
+  }
+  .overview-box .ov-sub {
+    font-size: 10px; margin-top: 2px;
+  }
+
+  /* ── HEAT MAP ── */
+  .heatmap {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; margin-bottom: 14px;
+  }
+  .heat-cell {
+    padding: 10px 6px; border-radius: 4px;
+    text-align: center; cursor: pointer;
+    transition: transform 0.15s;
+    border: 1px solid transparent;
+  }
+  .heat-cell:active { transform: scale(0.95); }
+  .heat-cell .hc-sym {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 13px; color: #fff;
+  }
+  .heat-cell .hc-chg {
+    font-size: 11px; color: #fff; margin-top: 2px;
+    font-weight: bold;
+  }
+
+  /* ── FEAR & GREED GAUGE ── */
+  .fg-gauge {
+    background: #0a1018; border: 1px solid #1a3050;
+    padding: 14px; border-radius: 4px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .fg-bar {
+    height: 8px; background: #050810;
+    border-radius: 4px; overflow: hidden;
+    margin: 8px 0;
+    background: linear-gradient(90deg, #ff4466 0%, #ffaa00 50%, #00e07a 100%);
+    position: relative;
+  }
+  .fg-pointer {
+    position: absolute; top: -4px; width: 4px; height: 16px;
+    background: #fff; border-radius: 2px;
+    transition: left 0.5s;
+    box-shadow: 0 0 8px rgba(255,255,255,0.5);
+  }
+
+  /* ── ANALYTICS ── */
+  .stats-big {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .big-stat {
+    background: #0a1018; border: 1px solid #1a3050;
+    padding: 14px; border-radius: 4px;
+  }
+  .big-stat .bs-label {
+    font-size: 9px; color: #5a8aaa;
+    letter-spacing: 1.5px;
+  }
+  .big-stat .bs-value {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 22px; margin-top: 4px;
+  }
+  .big-stat .bs-sub {
+    font-size: 10px; color: #5a8aaa; margin-top: 2px;
+  }
+
+  /* ── MODAL FOR ALERTS ── */
+  .alert-form select {
+    width: 100%; background: #050810;
+    border: 1px solid #1e3550; color: #e0eeff;
+    padding: 10px; font-family: inherit; font-size: 12px;
+    border-radius: 4px; outline: none;
+  }
+
+
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
     display: inline-block;
@@ -410,18 +690,26 @@
 
   <!-- ─── TABS ─── -->
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('signals')">SIGNALS</div>
-    <div class="tab" onclick="switchTab('markets')">MARKETS</div>
-    <div class="tab" onclick="switchTab('portfolio')">PORTFOLIO</div>
-    <div class="tab" onclick="switchTab('log')">LOG</div>
+    <div class="tab active" onclick="switchTab('overview', this)">📊 OVR</div>
+    <div class="tab" onclick="switchTab('signals', this)">⚡ AI</div>
+    <div class="tab" onclick="switchTab('markets', this)">📈 MKT</div>
+    <div class="tab" onclick="switchTab('alerts', this)">🔔 ALR</div>
+    <div class="tab" onclick="switchTab('portfolio', this)">💼 PRT</div>
+    <div class="tab" onclick="switchTab('analytics', this)">📑 STA</div>
+    <div class="tab" onclick="switchTab('log', this)">📋 LOG</div>
   </div>
 
   <!-- ─── CONTENT ─── -->
   <div class="content">
 
+    <!-- OVERVIEW TAB -->
+    <div class="view active" id="view-overview">
+      <div id="overviewContent"></div>
+    </div>
+
     <!-- SIGNALS TAB -->
-    <div class="view active" id="view-signals">
-      <button class="ai-cta" id="aiBtn" onclick="runAIAnalysis()">⚡ RUN AI ANALYSIS</button>
+    <div class="view" id="view-signals">
+      <button class="ai-cta" id="aiBtn" onclick="runAIAnalysis()">⚡ RUN AI ANALYSIS (multi-timeframe)</button>
       <div id="aiOutput"></div>
       <div id="signalsList"></div>
     </div>
@@ -431,9 +719,20 @@
       <div id="marketsList"></div>
     </div>
 
+    <!-- ALERTS TAB -->
+    <div class="view" id="view-alerts">
+      <button class="ai-cta" onclick="openAlertModal()" style="background:rgba(255,170,0,0.06);border-color:#ffaa00;color:#ffaa00;">🔔 + CREATE NEW ALERT</button>
+      <div id="alertsList"></div>
+    </div>
+
     <!-- PORTFOLIO TAB -->
     <div class="view" id="view-portfolio">
       <div id="portfolioContent"></div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div class="view" id="view-analytics">
+      <div id="analyticsContent"></div>
     </div>
 
     <!-- LOG TAB -->
@@ -495,7 +794,59 @@
     </div>
   </div>
 
+  <!-- ─── ALERT CREATION MODAL ─── -->
+  <div class="modal-overlay" id="alertModal">
+    <div class="modal">
+      <h2>🔔 NEW PRICE ALERT</h2>
+      <label>COIN</label>
+      <select id="alertCoin" class="alert-form" style="width:100%;background:#050810;border:1px solid #1e3550;color:#e0eeff;padding:10px;font-family:inherit;font-size:12px;border-radius:4px;outline:none;">
+        <option value="BTCUSDT">BTC</option>
+        <option value="ETHUSDT">ETH</option>
+        <option value="BNBUSDT">BNB</option>
+        <option value="SOLUSDT">SOL</option>
+        <option value="XRPUSDT">XRP</option>
+        <option value="ADAUSDT">ADA</option>
+        <option value="DOGEUSDT">DOGE</option>
+        <option value="AVAXUSDT">AVAX</option>
+        <option value="PAXGUSDT">GOLD</option>
+      </select>
+
+      <label>CONDITION</label>
+      <select id="alertCond" class="alert-form" style="width:100%;background:#050810;border:1px solid #1e3550;color:#e0eeff;padding:10px;font-family:inherit;font-size:12px;border-radius:4px;outline:none;">
+        <option value="above">Price goes ABOVE</option>
+        <option value="below">Price goes BELOW</option>
+        <option value="change_up">Pumps by % in 1h</option>
+        <option value="change_down">Drops by % in 1h</option>
+      </select>
+
+      <label>VALUE</label>
+      <input type="number" id="alertValue" placeholder="e.g. 70000 or 5" step="any" />
+      <div class="help-text">For above/below: the price target. For % changes: the percentage threshold.</div>
+
+      <div class="modal-btns">
+        <button class="modal-btn cancel" onclick="closeAlertModal()">CANCEL</button>
+        <button class="modal-btn primary" onclick="saveAlert()">CREATE</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
+
+  <!-- ─── COIN DETAIL VIEW ─── -->
+  <div class="detail-view" id="detailView">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">←</button>
+      <div class="detail-coin-info">
+        <div class="coin-name" id="detailName">—</div>
+        <div class="coin-full" id="detailFull">—</div>
+      </div>
+      <div class="detail-price-block">
+        <div class="detail-price live-price-detail" id="detailPrice">—</div>
+        <div class="detail-chg live-chg-detail" id="detailChg">—</div>
+      </div>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </div>
 </div>
 
 <script>
@@ -529,6 +880,12 @@ const state = {
   autoTrading: false,
   autoTimer: null,
   lastAnalysis: null,
+  alerts: [],          // price alerts
+  marketOverview: null, // BTC dominance, fear & greed, etc.
+  trailingStops: {},   // {symbol: {peakPrice, trailPct}}
+  hourAgoPrices: {},   // for % change alerts
+  fundingRates: {},    // futures funding rates
+  whaleAlerts: [],     // large trades feed
 };
 
 const settings = {
@@ -565,6 +922,12 @@ function loadSettings() {
   } catch {}
   try {
     state.logs = JSON.parse(localStorage.getItem(STORAGE_KEY + "_logs") || "[]");
+  } catch {}
+  try {
+    state.alerts = JSON.parse(localStorage.getItem(STORAGE_KEY + "_alerts") || "[]");
+  } catch {}
+  try {
+    state.trailingStops = JSON.parse(localStorage.getItem(STORAGE_KEY + "_trailing") || "{}");
   } catch {}
 }
 function saveSettings() {
@@ -623,6 +986,88 @@ async function fetchPrices() {
   } catch (e) {
     document.getElementById("liveDot").classList.add("red");
     log("err", `Price fetch error: ${e.message}`);
+  }
+}
+
+// ── WebSocket Live Stream — updates prices in real-time ─────
+let priceWS = null;
+let prevPrices = {};
+
+function startPriceStream() {
+  if (priceWS) try { priceWS.close(); } catch {}
+  // Binance combined stream for all our pairs at once
+  const streams = COINS.map(c => `${c.sym.toLowerCase()}@ticker`).join("/");
+  const url = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+  priceWS = new WebSocket(url);
+
+  priceWS.onopen = () => {
+    log("info", "📡 Live price stream connected");
+    document.getElementById("liveDot").classList.remove("red");
+  };
+
+  priceWS.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      const d = msg.data;
+      if (!d || !d.s) return;
+      // Convert WebSocket format to match REST format
+      const sym = d.s;
+      const newPrice = parseFloat(d.c);
+      const oldPrice = prevPrices[sym];
+
+      state.prices[sym] = {
+        symbol: sym,
+        lastPrice: d.c,
+        priceChangePercent: d.P,
+        highPrice: d.h,
+        lowPrice: d.l,
+        quoteVolume: d.q,
+        volume: d.v,
+      };
+
+      // Flash effect when price changes
+      if (oldPrice && oldPrice !== newPrice) {
+        flashPriceChange(sym, newPrice > oldPrice);
+      }
+      prevPrices[sym] = newPrice;
+
+      // Update UI live
+      if (currentTab === "markets") updateMarketRow(sym);
+      refreshHeader();
+    } catch (e) {}
+  };
+
+  priceWS.onerror = () => {
+    document.getElementById("liveDot").classList.add("red");
+  };
+
+  priceWS.onclose = () => {
+    log("warn", "Price stream disconnected — reconnecting...");
+    setTimeout(startPriceStream, 3000);
+  };
+}
+
+function flashPriceChange(sym, isUp) {
+  const row = document.querySelector(`[data-sym="${sym}"]`);
+  if (!row) return;
+  row.style.transition = "background 0.1s";
+  row.style.background = isUp ? "rgba(0,224,122,0.15)" : "rgba(255,68,102,0.15)";
+  setTimeout(() => { row.style.background = ""; }, 400);
+}
+
+function updateMarketRow(sym) {
+  const row = document.querySelector(`[data-sym="${sym}"]`);
+  if (!row) return;
+  const d = state.prices[sym];
+  if (!d) return;
+  const p = parseFloat(d.lastPrice);
+  const chg = parseFloat(d.priceChangePercent);
+  const priceEl = row.querySelector(".live-price");
+  const chgEl = row.querySelector(".live-chg");
+  if (priceEl) priceEl.textContent = `$${p < 1 ? p.toFixed(5) : p.toLocaleString("en", {maximumFractionDigits: 2})}`;
+  if (chgEl) {
+    chgEl.textContent = `${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%`;
+    chgEl.className = `c live-chg ${chg >= 0 ? "pos" : "neg"}`;
   }
 }
 
@@ -969,17 +1414,20 @@ function toggleBot() {
 //  RENDERING
 // ════════════════════════════════════════════════════════════
 
-let currentTab = "signals";
+let currentTab = "overview";
 
-function switchTab(tab) {
+function switchTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  event.target.classList.add("active");
+  if (el) el.classList.add("active");
   document.getElementById(`view-${tab}`).classList.add("active");
 
+  if (tab === "overview") renderOverview();
   if (tab === "markets") renderMarkets();
+  if (tab === "alerts") renderAlerts();
   if (tab === "portfolio") renderPortfolio();
+  if (tab === "analytics") renderAnalytics();
   if (tab === "log") renderLog();
   if (tab === "signals") renderSignals();
 }
@@ -1014,12 +1462,12 @@ function spark(arr, color) {
 function renderMarkets() {
   const html = COINS.map(c => {
     const d = state.prices[c.sym];
-    if (!d) return `<div class="coin-card"><div class="coin-icon" style="background:${c.color}">${c.short[0]}</div><div class="coin-info"><div class="name">${c.short}</div><div class="full">${c.name}</div></div><div></div><div class="coin-price"><div class="p">—</div></div></div>`;
+    if (!d) return `<div class="coin-card" data-sym="${c.sym}" onclick="openCoinDetail('${c.sym}')"><div class="coin-icon" style="background:${c.color}">${c.short[0]}</div><div class="coin-info"><div class="name">${c.short}</div><div class="full">${c.name}</div></div><div></div><div class="coin-price"><div class="p live-price">—</div></div></div>`;
     const p = parseFloat(d.lastPrice);
     const chg = parseFloat(d.priceChangePercent);
     const cls = chg >= 0 ? "pos" : "neg";
     return `
-      <div class="coin-card">
+      <div class="coin-card" data-sym="${c.sym}" onclick="openCoinDetail('${c.sym}')">
         <div class="coin-icon" style="background:${c.color}">${c.short[0]}</div>
         <div class="coin-info">
           <div class="name">${c.short}</div>
@@ -1027,8 +1475,8 @@ function renderMarkets() {
         </div>
         <div class="coin-spark">${spark(state.klines[c.sym] || [], c.color)}</div>
         <div class="coin-price">
-          <div class="p">$${p < 1 ? p.toFixed(5) : p.toLocaleString("en", {maximumFractionDigits: 2})}</div>
-          <div class="c ${cls}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</div>
+          <div class="p live-price">$${p < 1 ? p.toFixed(5) : p.toLocaleString("en", {maximumFractionDigits: 2})}</div>
+          <div class="c live-chg ${cls}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</div>
         </div>
       </div>`;
   }).join("");
@@ -1238,14 +1686,1427 @@ async function init() {
   renderSignals();
   renderPortfolio();
 
-  // Refresh prices every 15s
-  setInterval(fetchPrices, 15000);
+  // 🚀 Start LIVE price stream (multiple updates per second)
+  startPriceStream();
+
   // Refresh account every minute
   setInterval(() => { if (settings.binanceKey) fetchAccount(); }, 60000);
 }
 
 loadSettings();
 init();
+
+// ════════════════════════════════════════════════════════════
+//  COIN DETAIL VIEW — Deep dive per coin
+// ════════════════════════════════════════════════════════════
+
+let detailSym = null;
+let detailTimeframe = "1h";
+let detailNewsCache = {};
+
+async function openCoinDetail(sym) {
+  detailSym = sym;
+  detailTimeframe = "1h";
+  const view = document.getElementById("detailView");
+  view.classList.add("show");
+  await renderDetailView();
+}
+
+function closeDetail() {
+  document.getElementById("detailView").classList.remove("show");
+  detailSym = null;
+}
+
+async function renderDetailView() {
+  if (!detailSym) return;
+  const coin = COINS.find(c => c.sym === detailSym);
+  const d = state.prices[detailSym];
+  if (!coin) return;
+
+  const p = d ? parseFloat(d.lastPrice) : 0;
+  const chg = d ? parseFloat(d.priceChangePercent) : 0;
+  const high = d ? parseFloat(d.highPrice) : 0;
+  const low = d ? parseFloat(d.lowPrice) : 0;
+  const vol = d ? parseFloat(d.quoteVolume) : 0;
+
+  // Header
+  document.getElementById("detailName").innerHTML = `<span style="color:${coin.color}">●</span> ${coin.short}/USDT`;
+  document.getElementById("detailFull").textContent = coin.name;
+  document.getElementById("detailPrice").textContent = `$${p < 1 ? p.toFixed(5) : p.toLocaleString("en",{maximumFractionDigits:2})}`;
+  document.getElementById("detailPrice").style.color = chg >= 0 ? "#00e07a" : "#ff4466";
+  document.getElementById("detailChg").innerHTML = `${chg >= 0 ? "▲" : "▼"} ${Math.abs(chg).toFixed(2)}%`;
+  document.getElementById("detailChg").className = `detail-chg ${chg >= 0 ? "pos" : "neg"}`;
+
+  // Calculate indicators
+  const klines = state.klines[detailSym] || [];
+  const ma7 = klines.length >= 7 ? (klines.slice(-7).reduce((s,v) => s+v, 0)/7) : 0;
+  const ma24 = klines.length >= 24 ? (klines.reduce((s,v) => s+v, 0)/klines.length) : 0;
+  const rsi = calcRSI(klines);
+  const range24 = high - low;
+  const positionInRange = range24 > 0 ? ((p - low) / range24) * 100 : 50;
+
+  // Body
+  const body = document.getElementById("detailBody");
+  body.innerHTML = `
+    <!-- Quick stats grid -->
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="label">24H HIGH</div>
+        <div class="value pos">$${high.toLocaleString("en",{maximumFractionDigits: high<1?5:2})}</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">24H LOW</div>
+        <div class="value neg">$${low.toLocaleString("en",{maximumFractionDigits: low<1?5:2})}</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">24H VOLUME</div>
+        <div class="value">$${(vol/1e6).toFixed(1)}M</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">POSITION IN RANGE</div>
+        <div class="value">${positionInRange.toFixed(0)}%</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="detail-section">
+      <h3>📈 PRICE CHART</h3>
+      <div class="timeframe-tabs">
+        <button class="tf-btn ${detailTimeframe==='15m'?'active':''}" onclick="changeTF('15m')">15m</button>
+        <button class="tf-btn ${detailTimeframe==='1h'?'active':''}" onclick="changeTF('1h')">1H</button>
+        <button class="tf-btn ${detailTimeframe==='4h'?'active':''}" onclick="changeTF('4h')">4H</button>
+        <button class="tf-btn ${detailTimeframe==='1d'?'active':''}" onclick="changeTF('1d')">1D</button>
+        <button class="tf-btn ${detailTimeframe==='1w'?'active':''}" onclick="changeTF('1w')">1W</button>
+      </div>
+      <div class="chart-box">
+        <canvas id="bigChart" style="width:100%;height:100%;"></canvas>
+      </div>
+    </div>
+
+    <!-- TECHNICAL INDICATORS -->
+    <div class="detail-section">
+      <h3>📊 TECHNICAL INDICATORS</h3>
+      <div class="stat-box">
+        <div class="indicator-row">
+          <span class="ind-label">7-period MA</span>
+          <span class="ind-value">$${ma7.toFixed(ma7<1?5:2)} ${p > ma7 ? "<span class='pos'>(ABOVE ↑)</span>" : "<span class='neg'>(BELOW ↓)</span>"}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">24-period MA</span>
+          <span class="ind-value">$${ma24.toFixed(ma24<1?5:2)} ${p > ma24 ? "<span class='pos'>(ABOVE ↑)</span>" : "<span class='neg'>(BELOW ↓)</span>"}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">RSI (14)</span>
+          <span class="ind-value">${rsi.toFixed(1)} ${rsi > 70 ? "<span class='neg'>OVERBOUGHT</span>" : rsi < 30 ? "<span class='pos'>OVERSOLD</span>" : "<span style='color:#ffaa00'>NEUTRAL</span>"}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">Trend Signal</span>
+          <span class="ind-value">${p > ma7 && ma7 > ma24 ? "<span class='pos'>STRONG UP ↑↑</span>" : p > ma7 ? "<span class='pos'>UP ↑</span>" : p < ma7 && ma7 < ma24 ? "<span class='neg'>STRONG DOWN ↓↓</span>" : "<span class='neg'>DOWN ↓</span>"}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">Volatility</span>
+          <span class="ind-value">${range24/p*100 > 5 ? "<span style='color:#ff4466'>HIGH</span>" : range24/p*100 > 2 ? "<span style='color:#ffaa00'>MEDIUM</span>" : "<span class='pos'>LOW</span>"} (${(range24/p*100).toFixed(2)}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ANALYSIS -->
+    <div class="detail-section">
+      <h3>🤖 AI DEEP ANALYSIS</h3>
+      <div id="detailAI">
+        <button class="ai-cta" onclick="runDetailAI()">⚡ ANALYZE ${coin.short} NOW</button>
+      </div>
+    </div>
+
+    <!-- MARKET NEWS -->
+    <div class="detail-section">
+      <h3>📰 MARKET NEWS & SENTIMENT</h3>
+      <div id="detailNews">
+        <button class="ai-cta" onclick="fetchCoinNews()" style="background:rgba(255,107,53,0.06);border-color:#ff6b35;color:#ff6b35;">📰 FETCH LATEST NEWS</button>
+      </div>
+    </div>
+
+    <!-- QUICK TRADE -->
+    <div class="detail-section">
+      <h3>⚡ QUICK TRADE</h3>
+      <div class="quick-action">
+        <button class="qa-btn buy" onclick="quickTrade('BUY')">▲ BUY ${coin.short}</button>
+        <button class="qa-btn sell" onclick="quickTrade('SELL')">▼ SELL ${coin.short}</button>
+      </div>
+      <div style="text-align:center;margin-top:8px;color:#3a5a7a;font-size:10px;">
+        Trades use ${settings.maxPct}% of free USDT (set in ⚙ settings)
+      </div>
+    </div>
+  `;
+
+  // Draw chart
+  drawDetailChart(klines, coin.color);
+
+  // Restore cached AI/news if any
+  if (detailNewsCache[detailSym]) {
+    document.getElementById("detailNews").innerHTML = detailNewsCache[detailSym];
+  }
+}
+
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return 50;
+  let gains = 0, losses = 0;
+  for (let i = closes.length - period; i < closes.length; i++) {
+    const diff = closes[i] - closes[i-1];
+    if (diff > 0) gains += diff; else losses -= diff;
+  }
+  const avgGain = gains / period;
+  const avgLoss = losses / period;
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+function drawDetailChart(data, color) {
+  const c = document.getElementById("bigChart");
+  if (!c || !data || data.length < 2) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = c.offsetWidth, H = c.offsetHeight;
+  c.width = W * dpr; c.height = H * dpr;
+  const ctx = c.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const mn = Math.min(...data), mx = Math.max(...data), rng = mx - mn || 1;
+  const pts = data.map((v, i) => ({
+    x: (i / (data.length - 1)) * W,
+    y: H - ((v - mn) / rng) * (H * 0.85) - H * 0.075,
+  }));
+
+  // Grid
+  ctx.strokeStyle = "#ffffff08"; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = (H * 0.075) + (H * 0.85 / 4) * i;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, color + "30");
+  grad.addColorStop(1, color + "00");
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, H); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.shadowColor = color; ctx.shadowBlur = 8; ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Last dot
+  const last = pts[pts.length - 1];
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color; ctx.shadowBlur = 12; ctx.fill();
+}
+
+async function changeTF(tf) {
+  detailTimeframe = tf;
+  const intervalMap = { "15m": "15m", "1h": "1h", "4h": "4h", "1d": "1d", "1w": "1w" };
+  try {
+    const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${detailSym}&interval=${intervalMap[tf]}&limit=48`);
+    const data = await res.json();
+    state.klines[detailSym] = data.map(k => parseFloat(k[4]));
+    renderDetailView();
+  } catch (e) {
+    log("err", `Chart fetch error: ${e.message}`);
+  }
+}
+
+async function runDetailAI() {
+  if (!settings.anthropicKey) {
+    toast("Set Anthropic key in settings", "error");
+    openSettings();
+    return;
+  }
+  const out = document.getElementById("detailAI");
+  out.innerHTML = '<div class="ai-section"><span class="spinner"></span> Analyzing ' + detailSym + '...</div>';
+
+  const coin = COINS.find(c => c.sym === detailSym);
+  const d = state.prices[detailSym];
+  const p = parseFloat(d.lastPrice);
+  const chg = parseFloat(d.priceChangePercent);
+  const klines = state.klines[detailSym] || [];
+  const ma7 = klines.slice(-7).reduce((s,v) => s+v, 0)/7;
+  const ma24 = klines.reduce((s,v) => s+v, 0)/klines.length;
+  const rsi = calcRSI(klines);
+
+  const prompt = `You are a senior crypto analyst doing deep technical & fundamental analysis on a single asset.
+
+═══ COIN: ${coin.name} (${coin.short}/USDT) ═══
+
+Current price: $${p}
+24h change: ${chg.toFixed(2)}%
+24h high: $${parseFloat(d.highPrice)}
+24h low: $${parseFloat(d.lowPrice)}
+24h volume: $${(parseFloat(d.quoteVolume)/1e6).toFixed(1)}M
+MA7: $${ma7.toFixed(2)}
+MA24: $${ma24.toFixed(2)}
+RSI(14): ${rsi.toFixed(1)}
+
+═══ YOUR TASK ═══
+Use web_search to check:
+- Latest news about ${coin.name}
+- On-chain metrics or whale activity
+- Major events affecting ${coin.short}
+- Crypto fear/greed index
+
+Then provide a deep analysis. Be specific, no fluff.
+
+═══ OUTPUT (STRICT JSON, no markdown) ═══
+{
+  "verdict": "STRONG BUY" | "BUY" | "HOLD" | "SELL" | "STRONG SELL",
+  "confidence": 1-10,
+  "summary": "2 sentence overall view",
+  "bull_case": "what could push it up — be specific",
+  "bear_case": "what could push it down — be specific",
+  "key_levels": {
+    "support": 0,
+    "resistance": 0,
+    "next_target_up": 0,
+    "next_target_down": 0
+  },
+  "next_24h_outlook": "what to expect next 24 hours",
+  "trader_advice": "concrete action: what to do RIGHT NOW"
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": settings.anthropicKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    let raw = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    raw = raw.replace(/```json|```/g, "").trim();
+    const s = raw.indexOf("{"), e = raw.lastIndexOf("}") + 1;
+    const parsed = JSON.parse(raw.slice(s, e));
+
+    const verdictColors = {
+      "STRONG BUY": "#00e07a", "BUY": "#7be0a0", "HOLD": "#ffaa00",
+      "SELL": "#ff8866", "STRONG SELL": "#ff4466"
+    };
+    const vc = verdictColors[parsed.verdict] || "#ffaa00";
+
+    out.innerHTML = `
+      <div class="ai-section">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;color:${vc};">
+            ${parsed.verdict}
+          </div>
+          <div style="margin-left:auto;font-size:10px;color:#5a8aaa;">CONFIDENCE: ${parsed.confidence}/10</div>
+        </div>
+        <div style="font-size:12px;color:#e0eeff;line-height:1.6;margin-bottom:10px;">
+          ${parsed.summary}
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div style="padding:8px;background:rgba(0,224,122,0.05);border:1px solid #00e07a44;border-radius:4px;">
+            <div style="font-size:9px;color:#00e07a;letter-spacing:1px;margin-bottom:4px;">▲ BULL CASE</div>
+            <div style="font-size:11px;color:#a0c8b0;line-height:1.5;">${parsed.bull_case}</div>
+          </div>
+          <div style="padding:8px;background:rgba(255,68,102,0.05);border:1px solid #ff446644;border-radius:4px;">
+            <div style="font-size:9px;color:#ff4466;letter-spacing:1px;margin-bottom:4px;">▼ BEAR CASE</div>
+            <div style="font-size:11px;color:#c8a0a0;line-height:1.5;">${parsed.bear_case}</div>
+          </div>
+        </div>
+
+        <div style="background:#0a1018;border:1px solid #1a3050;padding:10px;border-radius:4px;margin-bottom:10px;">
+          <div style="font-size:9px;color:#5a8aaa;letter-spacing:1px;margin-bottom:6px;">KEY PRICE LEVELS</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
+            <div>Support: <span class="pos">$${Number(parsed.key_levels.support).toLocaleString()}</span></div>
+            <div>Resistance: <span class="neg">$${Number(parsed.key_levels.resistance).toLocaleString()}</span></div>
+            <div>Up Target: <span class="pos">$${Number(parsed.key_levels.next_target_up).toLocaleString()}</span></div>
+            <div>Down Target: <span class="neg">$${Number(parsed.key_levels.next_target_down).toLocaleString()}</span></div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:#7a9ab8;line-height:1.6;margin-bottom:8px;padding-left:10px;border-left:2px solid #1a3050;">
+          <b style="color:#5a8aaa;">📅 Next 24h:</b> ${parsed.next_24h_outlook}
+        </div>
+        <div style="background:rgba(0,170,255,0.06);border:1px solid #00aaff44;padding:10px;border-radius:4px;font-size:11px;color:#00c8ff;line-height:1.5;">
+          <b>💡 ADVICE:</b> ${parsed.trader_advice}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    out.innerHTML = `<div class="ai-section" style="color:#ff4466;font-size:11px;">Error: ${e.message}</div>`;
+  }
+}
+
+async function fetchCoinNews() {
+  if (!settings.anthropicKey) {
+    toast("Set Anthropic key in settings", "error");
+    openSettings();
+    return;
+  }
+  const out = document.getElementById("detailNews");
+  out.innerHTML = '<div class="ai-section"><span class="spinner"></span> Fetching latest news...</div>';
+
+  const coin = COINS.find(c => c.sym === detailSym);
+  const prompt = `Search the web for the LATEST 5-7 most important news items, events, and market-moving developments about ${coin.name} (${coin.short}) cryptocurrency from the last 7 days. Use web_search.
+
+For each, classify the impact on price as BULLISH, BEARISH, or NEUTRAL.
+
+Output STRICT JSON only (no markdown):
+{
+  "overall_sentiment": "BULLISH" | "BEARISH" | "MIXED",
+  "fear_greed_index": "current crypto fear & greed value if available",
+  "news": [
+    {
+      "title": "concise news headline",
+      "impact": "BULLISH" | "BEARISH" | "NEUTRAL",
+      "source": "source name",
+      "summary": "1-2 sentence what this means for price"
+    }
+  ]
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": settings.anthropicKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    let raw = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    raw = raw.replace(/```json|```/g, "").trim();
+    const s = raw.indexOf("{"), e = raw.lastIndexOf("}") + 1;
+    const parsed = JSON.parse(raw.slice(s, e));
+
+    const sentColor = parsed.overall_sentiment === "BULLISH" ? "#00e07a" : parsed.overall_sentiment === "BEARISH" ? "#ff4466" : "#ffaa00";
+
+    let html = `
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+        <span style="font-size:9px;color:#5a8aaa;letter-spacing:1px;">SENTIMENT:</span>
+        <span class="badge" style="color:${sentColor};border-color:${sentColor};">${parsed.overall_sentiment}</span>
+        ${parsed.fear_greed_index ? `<span style="font-size:10px;color:#5a8aaa;margin-left:auto;">F&G: ${parsed.fear_greed_index}</span>` : ""}
+      </div>
+    `;
+    html += parsed.news.map(n => {
+      const impactClass = n.impact === "BULLISH" ? "bullish" : n.impact === "BEARISH" ? "bearish" : "neutral";
+      const impactColor = n.impact === "BULLISH" ? "#00e07a" : n.impact === "BEARISH" ? "#ff4466" : "#ffaa00";
+      return `
+        <div class="news-card ${impactClass}">
+          <div class="title">${n.title}</div>
+          <div style="font-size:10px;color:#7a9ab8;line-height:1.5;margin:4px 0;">${n.summary || ""}</div>
+          <div class="meta">
+            <span class="impact" style="color:${impactColor}">${n.impact}</span>
+            <span>📍 ${n.source || "Crypto News"}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    out.innerHTML = html;
+    detailNewsCache[detailSym] = html; // cache so it doesn't reload
+  } catch (e) {
+    out.innerHTML = `<div class="ai-section" style="color:#ff4466;font-size:11px;">Error: ${e.message}</div>`;
+  }
+}
+
+async function quickTrade(side) {
+  if (!state.account) {
+    toast("Connect Binance first (settings)", "error");
+    openSettings();
+    return;
+  }
+  const usdt = state.account.balances.find(b => b.asset === "USDT");
+  const usdtFree = usdt ? parseFloat(usdt.free) : 0;
+  const coin = detailSym.replace("USDT","");
+  const bal = state.account.balances.find(b => b.asset === coin);
+
+  if (side === "BUY") {
+    const spend = usdtFree * (settings.maxPct / 100);
+    if (spend < 11) { toast("Insufficient USDT", "error"); return; }
+    if (!confirm(`BUY ${detailSym}\nSpend: $${spend.toFixed(2)} USDT\n\nProceed?`)) return;
+    await placeOrder(detailSym, "BUY", spend);
+    toast("BUY order placed!", "success");
+  } else {
+    if (!bal || parseFloat(bal.free) < 0.0001) { toast(`No ${coin} balance`, "error"); return; }
+    if (!confirm(`SELL all your ${coin}?\nQty: ${parseFloat(bal.free).toFixed(6)}\n\nProceed?`)) return;
+    await placeOrder(detailSym, "SELL", parseFloat(bal.free));
+    toast("SELL order placed!", "success");
+  }
+}
+
+// Update detail view live when prices stream in
+const oldUpdateMarketRow = updateMarketRow;
+updateMarketRow = function(sym) {
+  oldUpdateMarketRow(sym);
+  // If detail view is open for this coin, update its price too
+  if (detailSym === sym) {
+    const d = state.prices[sym];
+    if (!d) return;
+    const p = parseFloat(d.lastPrice);
+    const chg = parseFloat(d.priceChangePercent);
+    const pe = document.getElementById("detailPrice");
+    const ce = document.getElementById("detailChg");
+    if (pe) {
+      pe.textContent = `$${p < 1 ? p.toFixed(5) : p.toLocaleString("en",{maximumFractionDigits:2})}`;
+      pe.style.color = chg >= 0 ? "#00e07a" : "#ff4466";
+    }
+    if (ce) {
+      ce.innerHTML = `${chg >= 0 ? "▲" : "▼"} ${Math.abs(chg).toFixed(2)}%`;
+      ce.className = `detail-chg ${chg >= 0 ? "pos" : "neg"}`;
+    }
+  }
+  // Check alerts each price update
+  checkAlerts(sym);
+  // Check trailing stops
+  checkTrailingStops(sym);
+};
+
+// ════════════════════════════════════════════════════════════
+//  PRICE ALERTS + NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
+
+function saveAlerts() {
+  localStorage.setItem(STORAGE_KEY + "_alerts", JSON.stringify(state.alerts));
+}
+
+async function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    log("warn", "Browser doesn't support notifications");
+    return false;
+  }
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission !== "denied") {
+    const result = await Notification.requestPermission();
+    return result === "granted";
+  }
+  return false;
+}
+
+function fireAlert(alert, currentPrice) {
+  const coin = COINS.find(c => c.sym === alert.symbol);
+  const title = `🔔 APEX-1: ${coin?.short || alert.symbol} Alert`;
+  let body = "";
+  if (alert.type === "above") body = `Price reached $${currentPrice.toFixed(2)} — above your target $${alert.value}`;
+  else if (alert.type === "below") body = `Price dropped to $${currentPrice.toFixed(2)} — below your target $${alert.value}`;
+  else if (alert.type === "change_up") body = `${coin?.short} pumped ${alert.value}% in the last hour!`;
+  else if (alert.type === "change_down") body = `${coin?.short} dropped ${alert.value}% in the last hour!`;
+
+  // Show notification
+  if (Notification.permission === "granted") {
+    try {
+      new Notification(title, { body, icon: "icon-192.png", vibrate: [200, 100, 200], tag: "apex-alert" });
+    } catch {}
+  }
+  // Vibrate phone
+  if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 200]);
+  // Toast
+  toast(`🔔 ${body}`, "success");
+  log("warn", `🔔 ALERT: ${title} — ${body}`);
+
+  alert.triggered = true;
+  alert.triggeredAt = Date.now();
+  alert.triggeredPrice = currentPrice;
+  saveAlerts();
+  if (currentTab === "alerts") renderAlerts();
+}
+
+function checkAlerts(sym) {
+  const d = state.prices[sym];
+  if (!d) return;
+  const currentPrice = parseFloat(d.lastPrice);
+  for (const alert of state.alerts) {
+    if (alert.symbol !== sym || alert.triggered) continue;
+    if (alert.type === "above" && currentPrice >= alert.value) fireAlert(alert, currentPrice);
+    else if (alert.type === "below" && currentPrice <= alert.value) fireAlert(alert, currentPrice);
+    else if (alert.type === "change_up") {
+      const oldPrice = state.hourAgoPrices[sym];
+      if (oldPrice && ((currentPrice - oldPrice) / oldPrice * 100) >= alert.value) fireAlert(alert, currentPrice);
+    } else if (alert.type === "change_down") {
+      const oldPrice = state.hourAgoPrices[sym];
+      if (oldPrice && ((oldPrice - currentPrice) / oldPrice * 100) >= alert.value) fireAlert(alert, currentPrice);
+    }
+  }
+}
+
+// Track hourly prices for % change alerts
+function snapshotHourlyPrices() {
+  COINS.forEach(c => {
+    const d = state.prices[c.sym];
+    if (d) state.hourAgoPrices[c.sym] = parseFloat(d.lastPrice);
+  });
+  localStorage.setItem(STORAGE_KEY + "_hourAgo", JSON.stringify(state.hourAgoPrices));
+}
+
+function openAlertModal() {
+  document.getElementById("alertModal").classList.add("show");
+  requestNotificationPermission();
+}
+function closeAlertModal() {
+  document.getElementById("alertModal").classList.remove("show");
+  document.getElementById("alertValue").value = "";
+}
+function saveAlert() {
+  const sym = document.getElementById("alertCoin").value;
+  const cond = document.getElementById("alertCond").value;
+  const val = parseFloat(document.getElementById("alertValue").value);
+  if (!val || val <= 0) { toast("Enter a valid value", "error"); return; }
+  state.alerts.push({
+    id: Date.now(),
+    symbol: sym,
+    type: cond,
+    value: val,
+    triggered: false,
+    createdAt: Date.now(),
+  });
+  saveAlerts();
+  closeAlertModal();
+  renderAlerts();
+  toast("Alert created!", "success");
+  log("info", `Alert created: ${sym} ${cond} ${val}`);
+  requestNotificationPermission();
+}
+
+function deleteAlert(id) {
+  state.alerts = state.alerts.filter(a => a.id !== id);
+  saveAlerts();
+  renderAlerts();
+  toast("Alert deleted", "");
+}
+
+function renderAlerts() {
+  const c = document.getElementById("alertsList");
+  if (state.alerts.length === 0) {
+    c.innerHTML = `<div class="empty"><div class="icon">🔔</div><div>No alerts yet</div><div style="font-size:11px;margin-top:8px;">Create one above to get notified when prices hit targets</div></div>`;
+    return;
+  }
+  c.innerHTML = state.alerts.map(a => {
+    const coin = COINS.find(c => c.sym === a.symbol);
+    const d = state.prices[a.symbol];
+    const currentPrice = d ? parseFloat(d.lastPrice) : 0;
+    let condText = "";
+    if (a.type === "above") condText = `Trigger when price > $${a.value}`;
+    if (a.type === "below") condText = `Trigger when price < $${a.value}`;
+    if (a.type === "change_up") condText = `Trigger if pumps ${a.value}% in 1h`;
+    if (a.type === "change_down") condText = `Trigger if drops ${a.value}% in 1h`;
+    const status = a.triggered ? "✅ TRIGGERED" : "⏳ Watching...";
+    return `
+      <div class="alert-card ${a.triggered ? "triggered" : ""}">
+        <div class="coin-icon" style="background:${coin?.color || '#444'};width:32px;height:32px;">${coin?.short[0] || '?'}</div>
+        <div class="alert-info">
+          <div class="a-title">${coin?.short || a.symbol} — ${status}</div>
+          <div class="a-cond">${condText} | Now: $${currentPrice.toFixed(currentPrice<1?5:2)}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteAlert(${a.id})">×</button>
+      </div>
+    `;
+  }).join("");
+}
+
+// ════════════════════════════════════════════════════════════
+//  TRAILING STOP-LOSS
+// ════════════════════════════════════════════════════════════
+
+function checkTrailingStops(sym) {
+  if (!state.account) return;
+  const ts = state.trailingStops[sym];
+  if (!ts) return;
+
+  const d = state.prices[sym];
+  if (!d) return;
+  const currentPrice = parseFloat(d.lastPrice);
+
+  // Update peak if price made new high
+  if (currentPrice > ts.peakPrice) {
+    ts.peakPrice = currentPrice;
+    state.trailingStops[sym] = ts;
+    localStorage.setItem(STORAGE_KEY + "_trailing", JSON.stringify(state.trailingStops));
+  }
+
+  // Check if price dropped X% from peak
+  const dropPct = ((ts.peakPrice - currentPrice) / ts.peakPrice) * 100;
+  if (dropPct >= ts.trailPct) {
+    // Exit position
+    const coin = sym.replace("USDT","");
+    const bal = state.account.balances.find(b => b.asset === coin);
+    if (bal && parseFloat(bal.free) > 0.0001) {
+      log("warn", `🪜 TRAILING STOP triggered: ${sym} dropped ${dropPct.toFixed(2)}% from peak $${ts.peakPrice.toFixed(2)}`);
+      placeOrder(sym, "SELL", parseFloat(bal.free));
+    }
+    delete state.trailingStops[sym];
+    localStorage.setItem(STORAGE_KEY + "_trailing", JSON.stringify(state.trailingStops));
+  }
+}
+
+// Auto-create trailing stops for new BUY trades
+const oldPlaceOrder = placeOrder;
+placeOrder = async function(symbol, side, quoteQty) {
+  const result = await oldPlaceOrder(symbol, side, quoteQty);
+  if (result && side === "BUY") {
+    // Set trailing stop using settings.stopLoss as trail %
+    const fillPrice = parseFloat(result.fills?.[0]?.price || state.prices[symbol]?.lastPrice || 0);
+    state.trailingStops[symbol] = {
+      peakPrice: fillPrice,
+      trailPct: settings.stopLoss,
+      createdAt: Date.now(),
+    };
+    localStorage.setItem(STORAGE_KEY + "_trailing", JSON.stringify(state.trailingStops));
+    log("info", `🪜 Trailing stop activated for ${symbol}: ${settings.stopLoss}% from peak`);
+  }
+  return result;
+};
+
+// ════════════════════════════════════════════════════════════
+//  MARKET OVERVIEW
+// ════════════════════════════════════════════════════════════
+
+async function fetchMarketOverview() {
+  try {
+    // Get global crypto market data from CoinGecko (free, no key needed)
+    const res = await fetch("https://api.coingecko.com/api/v3/global");
+    if (!res.ok) throw new Error("CoinGecko error");
+    const data = await res.json();
+    state.marketOverview = data.data;
+    if (currentTab === "overview") renderOverview();
+  } catch (e) {
+    log("warn", `Overview fetch error: ${e.message}`);
+  }
+}
+
+async function fetchFearGreed() {
+  try {
+    const res = await fetch("https://api.alternative.me/fng/");
+    const data = await res.json();
+    if (data.data?.[0]) {
+      state.fearGreed = {
+        value: parseInt(data.data[0].value),
+        label: data.data[0].value_classification,
+      };
+      if (currentTab === "overview") renderOverview();
+    }
+  } catch (e) {
+    log("warn", `Fear & Greed fetch error: ${e.message}`);
+  }
+}
+
+async function fetchFundingRates() {
+  // Binance futures funding rates — public endpoint, no auth needed
+  try {
+    const res = await fetch("https://fapi.binance.com/fapi/v1/premiumIndex");
+    const all = await res.json();
+    const rates = {};
+    for (const item of all) {
+      if (COINS.find(c => c.sym === item.symbol)) {
+        rates[item.symbol] = item.lastFundingRate;
+      }
+    }
+    state.fundingRates = rates;
+    if (currentTab === "overview") renderOverview();
+    log("info", `Funding rates updated (${Object.keys(rates).length} pairs)`);
+  } catch (e) {
+    log("warn", `Funding rates error: ${e.message}`);
+  }
+}
+
+// ── WHALE WATCHER — listen to large trades via WebSocket ────
+let whaleWS = null;
+function startWhaleWatcher() {
+  if (whaleWS) try { whaleWS.close(); } catch {}
+  // Subscribe to trade streams for all pairs
+  const streams = COINS.map(c => `${c.sym.toLowerCase()}@aggTrade`).join("/");
+  const url = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+  whaleWS = new WebSocket(url);
+
+  whaleWS.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      const d = msg.data;
+      if (!d || !d.s) return;
+      const sym = d.s;
+      const price = parseFloat(d.p);
+      const qty = parseFloat(d.q);
+      const usdValue = price * qty;
+
+      // Threshold: $50k for stable coins like BTC/ETH, $25k for others
+      const threshold = (sym === "BTCUSDT" || sym === "ETHUSDT") ? 50000 : 25000;
+      if (usdValue >= threshold) {
+        const whale = {
+          symbol: sym,
+          price,
+          qty,
+          usdValue,
+          isBuy: !d.m, // d.m = buyer is market maker (false = aggressor was buyer)
+          time: Date.now(),
+        };
+        state.whaleAlerts.unshift(whale);
+        if (state.whaleAlerts.length > 30) state.whaleAlerts.length = 30;
+
+        // Notify on extra-large whales (>$100k)
+        if (usdValue > 100000) {
+          const coin = COINS.find(c => c.sym === sym);
+          const action = whale.isBuy ? "BOUGHT" : "SOLD";
+          log("info", `🐋 WHALE: ${action} $${(usdValue/1000).toFixed(1)}k of ${coin?.short || sym}`);
+        }
+
+        if (currentTab === "overview") renderOverview();
+      }
+    } catch (e) {}
+  };
+
+  whaleWS.onerror = () => {};
+  whaleWS.onclose = () => {
+    setTimeout(startWhaleWatcher, 5000);
+  };
+}
+
+function renderOverview() {
+  const c = document.getElementById("overviewContent");
+  const ov = state.marketOverview;
+  const fg = state.fearGreed;
+
+  // Top movers
+  const movers = COINS.map(coin => {
+    const d = state.prices[coin.sym];
+    if (!d) return null;
+    return { ...coin, chg: parseFloat(d.priceChangePercent), price: parseFloat(d.lastPrice) };
+  }).filter(Boolean);
+  movers.sort((a,b) => b.chg - a.chg);
+  const topGainers = movers.slice(0, 3);
+  const topLosers = movers.slice(-3).reverse();
+
+  let html = "";
+
+  // Fear & Greed
+  if (fg) {
+    const pct = fg.value;
+    html += `
+      <div class="fg-gauge">
+        <div style="font-size:10px;color:#5a8aaa;letter-spacing:2px;margin-bottom:4px;">FEAR & GREED INDEX</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:28px;color:${pct>=60?'#00e07a':pct>=40?'#ffaa00':'#ff4466'};">${pct} • ${fg.label.toUpperCase()}</div>
+        <div class="fg-bar">
+          <div class="fg-pointer" style="left:${pct}%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#3a5a7a;">
+          <span>EXTREME FEAR</span><span>NEUTRAL</span><span>EXTREME GREED</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Global market data
+  if (ov) {
+    const totalCap = ov.total_market_cap?.usd || 0;
+    const totalVol = ov.total_volume?.usd || 0;
+    const btcDom = ov.market_cap_percentage?.btc || 0;
+    const ethDom = ov.market_cap_percentage?.eth || 0;
+    const capChange = ov.market_cap_change_percentage_24h_usd || 0;
+    html += `
+      <div class="overview-grid">
+        <div class="overview-box">
+          <div class="ov-label">TOTAL MARKET CAP</div>
+          <div class="ov-value">$${(totalCap/1e12).toFixed(2)}T</div>
+          <div class="ov-sub ${capChange>=0?'pos':'neg'}">${capChange>=0?'+':''}${capChange.toFixed(2)}% (24h)</div>
+        </div>
+        <div class="overview-box">
+          <div class="ov-label">24H VOLUME</div>
+          <div class="ov-value">$${(totalVol/1e9).toFixed(1)}B</div>
+          <div class="ov-sub" style="color:#5a8aaa;">across ${ov.active_cryptocurrencies?.toLocaleString() || '?'} coins</div>
+        </div>
+        <div class="overview-box">
+          <div class="ov-label">BTC DOMINANCE</div>
+          <div class="ov-value" style="color:#F7931A;">${btcDom.toFixed(1)}%</div>
+          <div class="ov-sub" style="color:#5a8aaa;">${btcDom>50?'BTC season':'ALT season possible'}</div>
+        </div>
+        <div class="overview-box">
+          <div class="ov-label">ETH DOMINANCE</div>
+          <div class="ov-value" style="color:#627EEA;">${ethDom.toFixed(1)}%</div>
+          <div class="ov-sub" style="color:#5a8aaa;">${ov.active_market_pairs?.toLocaleString() || ''} pairs</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Heat map
+  html += `<div class="detail-section"><h3>🔥 HEAT MAP</h3><div class="heatmap">`;
+  for (const coin of COINS) {
+    const d = state.prices[coin.sym];
+    if (!d) continue;
+    const chg = parseFloat(d.priceChangePercent);
+    // Color intensity based on % change
+    const absChg = Math.abs(chg);
+    const intensity = Math.min(absChg / 10, 1);
+    const bg = chg >= 0
+      ? `rgba(0, 224, 122, ${0.15 + intensity * 0.5})`
+      : `rgba(255, 68, 102, ${0.15 + intensity * 0.5})`;
+    html += `
+      <div class="heat-cell" style="background:${bg};border-color:${chg>=0?'#00e07a44':'#ff446644'};" onclick="openCoinDetail('${coin.sym}')">
+        <div class="hc-sym">${coin.short}</div>
+        <div class="hc-chg">${chg>=0?'+':''}${chg.toFixed(2)}%</div>
+      </div>
+    `;
+  }
+  html += `</div></div>`;
+
+  // Top movers
+  html += `
+    <div class="detail-section">
+      <h3>🚀 TOP GAINERS (24H)</h3>
+      ${topGainers.map(m => `
+        <div class="alert-card" onclick="openCoinDetail('${m.sym}')" style="cursor:pointer;">
+          <div class="coin-icon" style="background:${m.color};width:32px;height:32px;">${m.short[0]}</div>
+          <div class="alert-info">
+            <div class="a-title">${m.short}</div>
+            <div class="a-cond">$${m.price < 1 ? m.price.toFixed(5) : m.price.toLocaleString("en",{maximumFractionDigits:2})}</div>
+          </div>
+          <div class="pos" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;">+${m.chg.toFixed(2)}%</div>
+        </div>
+      `).join("")}
+    </div>
+    <div class="detail-section">
+      <h3>📉 TOP LOSERS (24H)</h3>
+      ${topLosers.map(m => `
+        <div class="alert-card" onclick="openCoinDetail('${m.sym}')" style="cursor:pointer;">
+          <div class="coin-icon" style="background:${m.color};width:32px;height:32px;">${m.short[0]}</div>
+          <div class="alert-info">
+            <div class="a-title">${m.short}</div>
+            <div class="a-cond">$${m.price < 1 ? m.price.toFixed(5) : m.price.toLocaleString("en",{maximumFractionDigits:2})}</div>
+          </div>
+          <div class="neg" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;">${m.chg.toFixed(2)}%</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+  // Funding rates (futures sentiment)
+  if (state.fundingRates && Object.keys(state.fundingRates).length > 0) {
+    html += `
+      <div class="detail-section">
+        <h3>💸 FUTURES FUNDING RATES</h3>
+        <div style="font-size:10px;color:#5a8aaa;margin-bottom:8px;">
+          Positive = traders are too long (potential dump). Negative = too short (potential pump).
+        </div>
+    `;
+    const ratesArr = Object.entries(state.fundingRates).map(([sym, rate]) => {
+      const coin = COINS.find(c => c.sym === sym);
+      return { sym, rate: parseFloat(rate), coin };
+    }).filter(r => r.coin).sort((a, b) => Math.abs(b.rate) - Math.abs(a.rate));
+
+    for (const r of ratesArr.slice(0, 6)) {
+      const ratePct = r.rate * 100;
+      const annualized = ratePct * 3 * 365; // 3 funding periods/day
+      const isExtreme = Math.abs(ratePct) > 0.05;
+      const color = ratePct > 0.03 ? "#ff4466" : ratePct > 0 ? "#ffaa00" : ratePct < -0.03 ? "#00e07a" : "#5a8aaa";
+      const signal = ratePct > 0.05 ? "OVER-LEVERAGED LONG ⚠" : ratePct < -0.05 ? "OVER-LEVERAGED SHORT ⚠" : ratePct > 0 ? "Slightly long" : "Slightly short";
+      html += `
+        <div class="alert-card" onclick="openCoinDetail('${r.sym}')" style="cursor:pointer;">
+          <div class="coin-icon" style="background:${r.coin.color};width:32px;height:32px;">${r.coin.short[0]}</div>
+          <div class="alert-info">
+            <div class="a-title">${r.coin.short}</div>
+            <div class="a-cond" style="color:${color};font-size:10px;">${signal}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="color:${color};font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;">${ratePct >= 0 ? "+" : ""}${ratePct.toFixed(4)}%</div>
+            <div style="color:#3a5a7a;font-size:9px;">≈${annualized.toFixed(1)}% APR</div>
+          </div>
+        </div>
+      `;
+    }
+    html += `</div>`;
+  }
+
+  // Whale alerts
+  if (state.whaleAlerts && state.whaleAlerts.length > 0) {
+    html += `
+      <div class="detail-section">
+        <h3>🐋 WHALE WATCHER (LARGE TRADES)</h3>
+        <div style="font-size:10px;color:#5a8aaa;margin-bottom:8px;">
+          Big trades happening NOW on Binance — can signal incoming moves.
+        </div>
+    `;
+    for (const whale of state.whaleAlerts.slice(0, 8)) {
+      const coin = COINS.find(c => c.sym === whale.symbol);
+      if (!coin) continue;
+      const isBuy = whale.isBuy;
+      const color = isBuy ? "#00e07a" : "#ff4466";
+      const arrow = isBuy ? "▲" : "▼";
+      const action = isBuy ? "BOUGHT" : "SOLD";
+      const ago = Math.round((Date.now() - whale.time) / 1000);
+      html += `
+        <div class="alert-card" onclick="openCoinDetail('${whale.symbol}')" style="cursor:pointer;border-left:3px solid ${color};">
+          <div class="coin-icon" style="background:${coin.color};width:32px;height:32px;">${coin.short[0]}</div>
+          <div class="alert-info">
+            <div class="a-title">
+              <span style="color:${color};">${arrow} ${action}</span> ${coin.short}
+            </div>
+            <div class="a-cond">${whale.qty.toFixed(2)} ${coin.short} @ $${whale.price.toFixed(2)}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="color:${color};font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;">$${(whale.usdValue/1000).toFixed(1)}K</div>
+            <div style="color:#3a5a7a;font-size:9px;">${ago < 60 ? ago + "s" : Math.round(ago/60) + "m"} ago</div>
+          </div>
+        </div>
+      `;
+    }
+    html += `</div>`;
+  } else {
+    html += `
+      <div class="detail-section">
+        <h3>🐋 WHALE WATCHER</h3>
+        <div style="padding:20px;text-align:center;color:#3a5a7a;font-size:11px;line-height:1.7;">
+          Watching for large trades...<br>
+          <span style="font-size:10px;">Whale trades (>$50k) appear here as they happen</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Refresh button
+  html += `<button class="ai-cta" onclick="fetchMarketOverview();fetchFearGreed();fetchFundingRates();" style="background:transparent;border-color:#1e3550;color:#5a8aaa;">↻ REFRESH OVERVIEW</button>`;
+
+  c.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════
+//  ANALYTICS / TRADE PERFORMANCE
+// ════════════════════════════════════════════════════════════
+
+function calculateAnalytics() {
+  const trades = state.trades;
+  if (trades.length === 0) return null;
+
+  // Pair up BUY+SELL trades to calculate P&L
+  const buys = {};
+  const completedTrades = [];
+  // Process in chronological order (trades are stored newest-first)
+  const chrono = [...trades].reverse();
+
+  for (const t of chrono) {
+    if (t.side === "BUY") {
+      if (!buys[t.symbol]) buys[t.symbol] = [];
+      buys[t.symbol].push({ ...t });
+    } else if (t.side === "SELL") {
+      // Match against earliest BUY (FIFO)
+      const buyQueue = buys[t.symbol] || [];
+      let qtyToMatch = t.qty;
+      let totalCost = 0;
+      while (qtyToMatch > 0 && buyQueue.length > 0) {
+        const b = buyQueue[0];
+        if (b.qty <= qtyToMatch) {
+          totalCost += b.qty * b.price;
+          qtyToMatch -= b.qty;
+          buyQueue.shift();
+        } else {
+          totalCost += qtyToMatch * b.price;
+          b.qty -= qtyToMatch;
+          qtyToMatch = 0;
+        }
+      }
+      const matchedQty = t.qty - qtyToMatch;
+      const proceeds = matchedQty * t.price;
+      const pnl = proceeds - totalCost;
+      completedTrades.push({
+        symbol: t.symbol,
+        time: t.time,
+        qty: matchedQty,
+        avgBuy: matchedQty > 0 ? totalCost / matchedQty : 0,
+        sellPrice: t.price,
+        pnl,
+        pnlPct: totalCost > 0 ? (pnl / totalCost) * 100 : 0,
+      });
+    }
+  }
+
+  if (completedTrades.length === 0) {
+    // Calculate unrealized P&L from open positions
+    let unrealized = 0;
+    for (const sym in buys) {
+      for (const b of buys[sym]) {
+        const cur = parseFloat(state.prices[sym]?.lastPrice || 0);
+        if (cur > 0) unrealized += (cur - b.price) * b.qty;
+      }
+    }
+    return {
+      totalTrades: trades.length, completedTrades: 0,
+      totalPnL: 0, unrealized, winRate: 0, wins: 0, losses: 0,
+      bestTrade: null, worstTrade: null, avgWin: 0, avgLoss: 0,
+    };
+  }
+
+  const wins = completedTrades.filter(t => t.pnl > 0);
+  const losses = completedTrades.filter(t => t.pnl <= 0);
+  const totalPnL = completedTrades.reduce((s,t) => s + t.pnl, 0);
+  const bestTrade = completedTrades.reduce((b,t) => !b || t.pnl > b.pnl ? t : b, null);
+  const worstTrade = completedTrades.reduce((b,t) => !b || t.pnl < b.pnl ? t : b, null);
+  const avgWin = wins.length ? wins.reduce((s,t) => s + t.pnl, 0) / wins.length : 0;
+  const avgLoss = losses.length ? losses.reduce((s,t) => s + t.pnl, 0) / losses.length : 0;
+  const winRate = (wins.length / completedTrades.length) * 100;
+
+  // Unrealized
+  let unrealized = 0;
+  for (const sym in buys) {
+    for (const b of buys[sym]) {
+      const cur = parseFloat(state.prices[sym]?.lastPrice || 0);
+      if (cur > 0) unrealized += (cur - b.price) * b.qty;
+    }
+  }
+
+  return {
+    totalTrades: trades.length,
+    completedTrades: completedTrades.length,
+    totalPnL, unrealized, winRate,
+    wins: wins.length, losses: losses.length,
+    bestTrade, worstTrade, avgWin, avgLoss,
+    list: completedTrades.reverse(),
+  };
+}
+
+function renderAnalytics() {
+  const c = document.getElementById("analyticsContent");
+  const a = calculateAnalytics();
+
+  if (!a) {
+    c.innerHTML = `<div class="empty"><div class="icon">📊</div><div>No trade data yet</div><div style="font-size:11px;margin-top:8px;">Start trading to see your performance analytics</div></div>`;
+    return;
+  }
+
+  const totalProfit = a.totalPnL + a.unrealized;
+  const profitColor = totalProfit >= 0 ? "#00e07a" : "#ff4466";
+
+  let html = `
+    <div class="stats-big">
+      <div class="big-stat">
+        <div class="bs-label">REALIZED P&L</div>
+        <div class="bs-value" style="color:${a.totalPnL >= 0 ? '#00e07a' : '#ff4466'}">${a.totalPnL >= 0 ? '+' : ''}$${a.totalPnL.toFixed(2)}</div>
+        <div class="bs-sub">From ${a.completedTrades} closed trades</div>
+      </div>
+      <div class="big-stat">
+        <div class="bs-label">UNREALIZED P&L</div>
+        <div class="bs-value" style="color:${a.unrealized >= 0 ? '#00e07a' : '#ff4466'}">${a.unrealized >= 0 ? '+' : ''}$${a.unrealized.toFixed(2)}</div>
+        <div class="bs-sub">Open positions</div>
+      </div>
+      <div class="big-stat">
+        <div class="bs-label">WIN RATE</div>
+        <div class="bs-value" style="color:${a.winRate >= 50 ? '#00e07a' : '#ffaa00'}">${a.winRate.toFixed(1)}%</div>
+        <div class="bs-sub">${a.wins}W / ${a.losses}L</div>
+      </div>
+      <div class="big-stat">
+        <div class="bs-label">TOTAL TRADES</div>
+        <div class="bs-value">${a.totalTrades}</div>
+        <div class="bs-sub">All time activity</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>📈 PERFORMANCE METRICS</h3>
+      <div class="stat-box">
+        <div class="indicator-row">
+          <span class="ind-label">Total profit (realized + open)</span>
+          <span class="ind-value" style="color:${profitColor}">${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">Average winning trade</span>
+          <span class="ind-value pos">+$${a.avgWin.toFixed(2)}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">Average losing trade</span>
+          <span class="ind-value neg">$${a.avgLoss.toFixed(2)}</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-label">Risk/Reward ratio</span>
+          <span class="ind-value">${a.avgLoss !== 0 ? (Math.abs(a.avgWin / a.avgLoss)).toFixed(2) : '—'} : 1</span>
+        </div>
+        ${a.bestTrade ? `
+        <div class="indicator-row">
+          <span class="ind-label">Best trade</span>
+          <span class="ind-value pos">${a.bestTrade.symbol.replace('USDT','')} +$${a.bestTrade.pnl.toFixed(2)} (${a.bestTrade.pnlPct.toFixed(1)}%)</span>
+        </div>` : ""}
+        ${a.worstTrade ? `
+        <div class="indicator-row">
+          <span class="ind-label">Worst trade</span>
+          <span class="ind-value neg">${a.worstTrade.symbol.replace('USDT','')} $${a.worstTrade.pnl.toFixed(2)} (${a.worstTrade.pnlPct.toFixed(1)}%)</span>
+        </div>` : ""}
+      </div>
+    </div>
+  `;
+
+  // Closed trades list
+  if (a.list && a.list.length > 0) {
+    html += `<div class="detail-section"><h3>📋 RECENT CLOSED TRADES</h3>`;
+    html += a.list.slice(0, 10).map(t => `
+      <div class="alert-card">
+        <div class="coin-icon" style="background:${COINS.find(c=>c.sym===t.symbol)?.color || '#444'};width:28px;height:28px;font-size:9px;">${t.symbol.replace('USDT','')[0]}</div>
+        <div class="alert-info">
+          <div class="a-title">${t.symbol.replace('USDT','')}</div>
+          <div class="a-cond">${new Date(t.time).toLocaleString("en-GB")}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Rajdhani',sans-serif;font-weight:700;color:${t.pnl>=0?'#00e07a':'#ff4466'};">
+            ${t.pnl>=0?'+':''}$${t.pnl.toFixed(2)}
+          </div>
+          <div style="font-size:10px;color:${t.pnl>=0?'#00e07a':'#ff4466'};">
+            ${t.pnlPct>=0?'+':''}${t.pnlPct.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+    `).join("");
+    html += `</div>`;
+  }
+
+  // Active trailing stops
+  const activeTS = Object.entries(state.trailingStops);
+  if (activeTS.length > 0) {
+    html += `<div class="detail-section"><h3>🪜 ACTIVE TRAILING STOPS</h3>`;
+    html += activeTS.map(([sym, ts]) => {
+      const cur = parseFloat(state.prices[sym]?.lastPrice || 0);
+      const dropFromPeak = ts.peakPrice > 0 ? ((ts.peakPrice - cur) / ts.peakPrice * 100) : 0;
+      const close = ts.trailPct - dropFromPeak;
+      return `
+        <div class="alert-card">
+          <div class="coin-icon" style="background:${COINS.find(c=>c.sym===sym)?.color || '#444'};width:28px;height:28px;font-size:9px;">${sym.replace('USDT','')[0]}</div>
+          <div class="alert-info">
+            <div class="a-title">${sym.replace('USDT','')}</div>
+            <div class="a-cond">Peak: $${ts.peakPrice.toFixed(2)} | Trail: ${ts.trailPct}% | Drop: ${dropFromPeak.toFixed(2)}%</div>
+          </div>
+          <div style="text-align:right;font-size:11px;color:${close<2?'#ff4466':'#00e07a'};">
+            ${close > 0 ? `${close.toFixed(1)}% to stop` : "TRIGGERING..."}
+          </div>
+        </div>
+      `;
+    }).join("");
+    html += `</div>`;
+  }
+
+  c.innerHTML = html;
+}
+
+// ════════════════════════════════════════════════════════════
+//  MULTI-TIMEFRAME AI ANALYSIS (UPGRADED)
+// ════════════════════════════════════════════════════════════
+
+async function fetchMultiTFKlines(sym) {
+  const tfs = { "15m": 32, "1h": 24, "4h": 24, "1d": 14 };
+  const result = {};
+  for (const [tf, limit] of Object.entries(tfs)) {
+    try {
+      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${tf}&limit=${limit}`);
+      const data = await res.json();
+      result[tf] = data.map(k => parseFloat(k[4]));
+    } catch {}
+  }
+  return result;
+}
+
+// Override original runAIAnalysis with multi-timeframe version
+const oldRunAI = runAIAnalysis;
+runAIAnalysis = async function() {
+  if (!settings.anthropicKey) {
+    toast("Set Anthropic key in settings", "error");
+    openSettings();
+    return;
+  }
+  const btn = document.getElementById("aiBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>MULTI-TF ANALYZING...';
+
+  log("ai", "🎯 Multi-timeframe AI analysis started");
+
+  // Build multi-timeframe market data
+  const market = [];
+  for (const c of COINS) {
+    const d = state.prices[c.sym];
+    if (!d) continue;
+    const p = parseFloat(d.lastPrice);
+    const chg = parseFloat(d.priceChangePercent);
+
+    // Get multi-TF data for top movers (limit API calls)
+    const klines = state.klines[c.sym] || [];
+    const ma7 = klines.length >= 7 ? klines.slice(-7).reduce((s,v) => s+v, 0)/7 : p;
+    const ma24 = klines.length > 0 ? klines.reduce((s,v) => s+v, 0)/klines.length : p;
+    const rsi = calcRSI(klines);
+    const trend = p > ma7 && ma7 > ma24 ? "STRONG_UP" : p > ma7 ? "UP" : p < ma7 && ma7 < ma24 ? "STRONG_DOWN" : "DOWN";
+
+    market.push(`${c.short}: $${p.toFixed(p<1?5:2)} | 24h: ${chg>=0?'+':''}${chg.toFixed(2)}% | MA7: $${ma7.toFixed(2)} | RSI: ${rsi.toFixed(1)} | Trend: ${trend}`);
+  }
+
+  // Portfolio
+  let usdtFree = 0, holdings = "None";
+  if (state.account) {
+    const usdt = state.account.balances.find(b => b.asset === "USDT");
+    usdtFree = usdt ? parseFloat(usdt.free) : 0;
+    const heldList = state.account.balances
+      .filter(b => parseFloat(b.free) + parseFloat(b.locked) > 0 && b.asset !== "USDT")
+      .map(b => {
+        const sym = b.asset + "USDT";
+        const p = state.prices[sym] ? parseFloat(state.prices[sym].lastPrice) : 0;
+        const total = parseFloat(b.free) + parseFloat(b.locked);
+        return `${b.asset}: ${total.toFixed(6)} (≈$${(total * p).toFixed(2)})`;
+      });
+    if (heldList.length) holdings = heldList.join(", ");
+  }
+
+  // Past trades
+  const recentTrades = state.trades.slice(0, 8).map(t => `${new Date(t.time).toLocaleString("en-GB")}: ${t.side} ${t.symbol} ${t.qty} @ $${t.price}`).join("\n") || "None";
+
+  // Performance
+  const analytics = calculateAnalytics();
+  const performanceContext = analytics
+    ? `Win rate: ${analytics.winRate.toFixed(1)}% | Total realized P&L: $${analytics.totalPnL.toFixed(2)} | Trades: ${analytics.completedTrades} closed`
+    : "No history yet";
+
+  // Fear & Greed
+  const fgContext = state.fearGreed
+    ? `Crypto Fear & Greed: ${state.fearGreed.value}/100 (${state.fearGreed.label})`
+    : "";
+
+  const prompt = `You are APEX-1, an elite crypto trading AI doing MULTI-TIMEFRAME confirmation analysis.
+
+═══ MARKET CONTEXT ═══
+${fgContext}
+${state.marketOverview ? `BTC Dominance: ${(state.marketOverview.market_cap_percentage?.btc || 0).toFixed(1)}%` : ""}
+
+═══ LIVE DATA WITH TECHNICAL INDICATORS ═══
+${market.join('\n')}
+
+═══ USER PORTFOLIO ═══
+Free USDT: $${usdtFree.toFixed(2)}
+Holdings: ${holdings}
+
+═══ TRADING PERFORMANCE ═══
+${performanceContext}
+
+═══ RECENT TRADES ═══
+${recentTrades}
+
+═══ STRICT RULES ═══
+- ONLY signal a BUY if: short-term trend is UP + RSI not overbought (>70) + price above MA7
+- ONLY signal a SELL if: position held + (RSI overbought OR trend reversed)
+- Use web_search for breaking news that could affect signals
+- Reflect on past trades — adjust if seeing patterns of losses
+- Quality over quantity. 0-2 high-conviction signals max.
+- Max ${settings.maxPct}% of free USDT per trade
+
+═══ OUTPUT (STRICT JSON) ═══
+{
+  "headline": "one-line market summary <80 chars",
+  "sentiment": "BULLISH" | "BEARISH" | "NEUTRAL",
+  "analysis": "3-4 sentences with multi-timeframe reasoning",
+  "reflection": "1-2 sentences reviewing past trades",
+  "risk_level": "LOW" | "MEDIUM" | "HIGH",
+  "signals": [
+    {
+      "symbol": "BTCUSDT",
+      "action": "BUY" | "SELL" | "WATCH",
+      "strength": "STRONG" | "MODERATE" | "WEAK",
+      "timeframe_alignment": "ALIGNED" | "MIXED",
+      "allocation": 0.15,
+      "entry": 65000,
+      "target": 70000,
+      "stop": 62000,
+      "reason": "concise reason <100 chars"
+    }
+  ]
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": settings.anthropicKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    let raw = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    raw = raw.replace(/```json|```/g, "").trim();
+    const s = raw.indexOf("{"), e = raw.lastIndexOf("}") + 1;
+    const parsed = JSON.parse(raw.slice(s, e));
+
+    state.aiOutput = parsed;
+    state.signals = parsed.signals || [];
+    state.lastAnalysis = Date.now();
+
+    log("ai", `Multi-TF: ${parsed.sentiment} | Risk: ${parsed.risk_level} | ${state.signals.length} signals`);
+    parsed.signals?.forEach(sg => log(sg.action.toLowerCase(), `${sg.action} ${sg.symbol} (${sg.timeframe_alignment || ''}): ${sg.reason}`));
+
+    renderSignals();
+
+    if (state.autoTrading && state.signals.length > 0) {
+      // Only execute ALIGNED, STRONG signals on auto
+      state.signals = state.signals.filter(s => s.timeframe_alignment === "ALIGNED" || s.strength === "STRONG");
+      await autoExecuteSignals();
+    }
+
+  } catch (e) {
+    log("err", `AI error: ${e.message}`);
+    toast(`AI: ${e.message}`, "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "⚡ RUN AI ANALYSIS (multi-timeframe)";
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+//  INITIALIZE NEW FEATURES
+// ════════════════════════════════════════════════════════════
+
+// Load hour-ago prices for % change alerts
+try {
+  state.hourAgoPrices = JSON.parse(localStorage.getItem(STORAGE_KEY + "_hourAgo") || "{}");
+} catch {}
+
+// Snapshot prices every hour for change alerts
+setInterval(snapshotHourlyPrices, 60 * 60 * 1000);
+// Initial snapshot after 30s (once prices have loaded)
+setTimeout(snapshotHourlyPrices, 30000);
+
+// Refresh market overview & fear/greed every 5 min
+setTimeout(() => { fetchMarketOverview(); fetchFearGreed(); fetchFundingRates(); }, 2000);
+setInterval(() => { fetchMarketOverview(); fetchFearGreed(); fetchFundingRates(); }, 5 * 60 * 1000);
+
+// Start whale watcher (live large trades)
+setTimeout(startWhaleWatcher, 4000);
+
+// Initial render of overview tab
+setTimeout(() => { if (currentTab === "overview") renderOverview(); }, 3000);
+
+// Request notifications permission early
+setTimeout(requestNotificationPermission, 5000);
+
 
 // service worker disabled in single-file mode
 
