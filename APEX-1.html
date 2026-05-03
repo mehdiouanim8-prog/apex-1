@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#07080d" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="APEX-1" />
+
+
+<title>APEX-1 Trading Agent</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: #07080d; color: #c5d8f0;
+    font-family: 'Share Tech Mono', monospace;
+    height: 100%; overflow: hidden;
+    overscroll-behavior: none;
+    user-select: none; -webkit-user-select: none;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  body { font-size: 13px; line-height: 1.5; }
+  ::-webkit-scrollbar { display: none; }
+  input, textarea { -webkit-user-select: text; user-select: text; }
+
+  #app {
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    max-width: 480px; margin: 0 auto;
+    background: #07080d;
+    position: relative;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0a0f1a 0%, #0d1525 100%);
+    border-bottom: 1px solid #1a2f45;
+    padding: 12px 16px 10px;
+    display: flex; align-items: center; gap: 12px;
+    position: relative;
+  }
+  .logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 22px;
+    color: #00c8ff; letter-spacing: 3px;
+  }
+  .logo .accent { color: #ff6b35; }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #00e07a; box-shadow: 0 0 8px #00e07a;
+    animation: blink 1.8s ease-in-out infinite;
+  }
+  .live-dot.red { background: #ff4466; box-shadow: 0 0 8px #ff4466; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .header-right {
+    margin-left: auto; text-align: right;
+  }
+  .header-right .label { color: #2a4a6a; font-size: 9px; letter-spacing: 1px; }
+  .header-right .value {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600; font-size: 18px; color: #ffaa00;
+  }
+  .settings-btn {
+    background: transparent; border: 1px solid #1e3550;
+    color: #5a8aaa; padding: 6px 10px;
+    font-family: inherit; font-size: 11px;
+    cursor: pointer; border-radius: 4px;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; background: #0a0f18;
+    border-bottom: 1px solid #111822;
+  }
+  .tab {
+    flex: 1; padding: 12px 4px; text-align: center;
+    color: #3a5a7a; font-size: 11px; letter-spacing: 1.5px;
+    border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active {
+    color: #00c8ff; border-bottom-color: #00c8ff;
+    background: rgba(0,200,255,0.04);
+  }
+
+  /* ── CONTENT AREAS ── */
+  .content {
+    flex: 1; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .view { display: none; padding: 12px; }
+  .view.active { display: block; }
+
+  /* ── COIN CARDS (Markets view) ── */
+  .coin-card {
+    background: #0a1018; border: 1px solid #111822;
+    padding: 12px; margin-bottom: 8px;
+    display: grid; grid-template-columns: auto 1fr auto auto;
+    gap: 10px; align-items: center;
+    transition: transform 0.15s;
+  }
+  .coin-card:active { transform: scale(0.98); }
+  .coin-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 11px; color: #fff;
+  }
+  .coin-info .name {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 14px; color: #e0eeff;
+  }
+  .coin-info .full {
+    font-size: 10px; color: #3a5a7a;
+  }
+  .coin-spark { width: 60px; height: 28px; }
+  .coin-price {
+    text-align: right;
+  }
+  .coin-price .p {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    font-size: 14px; color: #c0d8f0;
+  }
+  .coin-price .c { font-size: 11px; font-weight: bold; }
+  .pos { color: #00e07a; }
+  .neg { color: #ff4466; }
+
+  /* ── AI BUTTON ── */
+  .ai-cta {
+    background: linear-gradient(135deg, rgba(0,180,255,0.12), rgba(255,107,53,0.06));
+    border: 1px solid #00aaff;
+    color: #00c8ff;
+    padding: 16px;
+    width: 100%;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 16px;
+    letter-spacing: 2px; cursor: pointer;
+    margin-bottom: 12px;
+    box-shadow: 0 0 16px rgba(0,170,255,0.2);
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .ai-cta:active { transform: scale(0.98); }
+  .ai-cta:disabled {
+    opacity: 0.5; border-color: #1e3550; color: #3a6a8a;
+    box-shadow: none; cursor: default;
+  }
+
+  /* ── AI ANALYSIS ── */
+  .ai-card {
+    background: #0a1520; border: 1px solid #1a3050;
+    padding: 14px; margin-bottom: 12px;
+    border-radius: 4px;
+  }
+  .ai-card .headline {
+    color: #e0eeff; font-size: 13px;
+    line-height: 1.5; margin-bottom: 8px;
+  }
+  .ai-card .meta {
+    display: flex; gap: 8px; margin-bottom: 8px;
+  }
+  .badge {
+    font-size: 9px; padding: 2px 8px;
+    border: 1px solid currentColor;
+    letter-spacing: 1px; border-radius: 2px;
+  }
+  .ai-card .analysis {
+    color: #7a9ab8; font-size: 11px;
+    line-height: 1.7; padding-left: 10px;
+    border-left: 2px solid #1a3050;
+  }
+
+  /* ── SIGNAL CARD ── */
+  .signal-card {
+    border: 1px solid; padding: 12px;
+    margin-bottom: 10px; border-radius: 4px;
+  }
+  .signal-card.buy { background: rgba(0,224,122,0.05); border-color: #00e07a44; }
+  .signal-card.sell { background: rgba(255,68,102,0.05); border-color: #ff446644; }
+  .signal-card.watch { background: rgba(255,170,0,0.05); border-color: #ffaa0044; }
+  .signal-head {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 6px;
+  }
+  .signal-head .ticker {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    font-size: 16px; color: #e0eeff;
+  }
+  .signal-tags { display: flex; gap: 6px; }
+  .signal-reason { font-size: 11px; color: #5a8ab0; margin-bottom: 8px; }
+  .signal-levels {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 10px;
+  }
+  .signal-levels .lvl { text-align: center; }
+  .signal-levels .lvl .l { font-size: 9px; color: #3a5a7a; letter-spacing: 1px; }
+  .signal-levels .lvl .v {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600; font-size: 13px;
+    margin-top: 2px;
+  }
+  .trade-btn {
+    width: 100%; padding: 10px;
+    border: 1px solid; background: transparent;
+    color: inherit; font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 13px; letter-spacing: 2px;
+    cursor: pointer; border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .trade-btn:active { transform: scale(0.97); }
+  .trade-btn.buy { color: #00e07a; border-color: #00e07a; }
+  .trade-btn.buy:active { background: rgba(0,224,122,0.15); }
+  .trade-btn.sell { color: #ff4466; border-color: #ff4466; }
+  .trade-btn.sell:active { background: rgba(255,68,102,0.15); }
+
+  /* ── PORTFOLIO ── */
+  .pf-summary {
+    background: linear-gradient(135deg, #0a1520 0%, #0d1a28 100%);
+    border: 1px solid #1a3050;
+    padding: 16px; margin-bottom: 12px;
+    border-radius: 4px;
+  }
+  .pf-summary .total {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700; font-size: 28px;
+    color: #ffaa00;
+  }
+  .pf-summary .label {
+    color: #2a4a6a; font-size: 10px; letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .pf-summary .row {
+    display: flex; justify-content: space-between;
+    margin-top: 8px; font-size: 11px; color: #5a8aaa;
+  }
+  .pf-summary .row .v { color: #c0d8f0; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+
+  .holding {
+    background: #0a1018; border: 1px solid #111822;
+    padding: 10px 12px; margin-bottom: 6px;
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 10px; align-items: center;
+    border-radius: 4px;
+  }
+  .holding .qty {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    color: #e0eeff;
+  }
+  .holding .qty .sub { color: #3a5a7a; font-size: 10px; font-weight: 400; }
+  .holding .val {
+    text-align: right;
+    font-family: 'Rajdhani', sans-serif; font-weight: 600;
+    color: #c0d8f0;
+  }
+  .holding .val .pct { font-size: 11px; }
+
+  /* ── LOG ── */
+  .log-entry {
+    padding: 8px 12px; border-bottom: 1px solid #0d1520;
+    font-size: 11px; line-height: 1.5;
+  }
+  .log-entry .time { color: #1e3550; font-size: 10px; }
+  .log-entry .tag {
+    font-size: 9px; padding: 1px 5px;
+    border: 1px solid currentColor;
+    margin: 0 6px; letter-spacing: 1px;
+  }
+  .log-entry.ai .tag { color: #7b9fff; }
+  .log-entry.buy .tag { color: #00e07a; }
+  .log-entry.sell .tag { color: #ff4466; }
+  .log-entry.err .tag { color: #ff4466; }
+  .log-entry.info .tag { color: #5a8aaa; }
+  .log-entry.warn .tag { color: #ffaa00; }
+  .log-entry .msg { color: #7a9ab8; }
+
+  /* ── SETTINGS / MODAL ── */
+  .modal-overlay {
+    position: absolute; inset: 0;
+    background: rgba(7,8,13,0.95);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #0a1018; border: 1px solid #1e3550;
+    padding: 20px; width: 100%; max-width: 400px;
+    border-radius: 8px; max-height: 90%;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    font-family: 'Rajdhani', sans-serif; font-weight: 700;
+    color: #00c8ff; margin-bottom: 12px;
+    font-size: 18px; letter-spacing: 1px;
+  }
+  .modal label {
+    display: block; color: #5a8aaa;
+    font-size: 11px; letter-spacing: 1px;
+    margin: 12px 0 4px;
+  }
+  .modal input {
+    width: 100%; background: #050810;
+    border: 1px solid #1e3550; color: #e0eeff;
+    padding: 10px; font-family: inherit;
+    font-size: 12px; border-radius: 4px;
+    outline: none;
+  }
+  .modal input:focus { border-color: #00aaff; }
+  .modal-btns {
+    display: flex; gap: 8px; margin-top: 20px;
+  }
+  .modal-btn {
+    flex: 1; padding: 12px; border: 1px solid;
+    background: transparent;
+    font-family: inherit; font-size: 12px;
+    letter-spacing: 1px; cursor: pointer;
+    border-radius: 4px;
+  }
+  .modal-btn.primary { color: #00c8ff; border-color: #00aaff; }
+  .modal-btn.primary:active { background: rgba(0,170,255,0.15); }
+  .modal-btn.danger { color: #ff4466; border-color: #ff4466; }
+  .modal-btn.cancel { color: #5a8aaa; border-color: #1e3550; }
+  .help-text {
+    font-size: 10px; color: #3a5a7a;
+    line-height: 1.6; margin-top: 6px;
+  }
+  .warn-box {
+    background: rgba(255,170,0,0.06); border: 1px solid #ffaa0044;
+    padding: 10px; border-radius: 4px;
+    color: #ffaa00; font-size: 11px;
+    line-height: 1.5; margin-bottom: 12px;
+  }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    border-top: 1px solid #1a2f45;
+    padding: 8px 12px; background: #0a0f18;
+    display: flex; gap: 8px; align-items: center;
+    flex-shrink: 0;
+  }
+  .bot-status {
+    display: flex; align-items: center; gap: 6px;
+    flex: 1; font-size: 10px; color: #5a8aaa;
+  }
+  .bot-toggle {
+    background: transparent; border: 1px solid #ff4466;
+    color: #ff4466; padding: 6px 12px;
+    font-family: inherit; font-size: 10px;
+    letter-spacing: 1px; cursor: pointer;
+    border-radius: 4px;
+  }
+  .bot-toggle.on {
+    border-color: #00e07a; color: #00e07a;
+    background: rgba(0,224,122,0.08);
+  }
+
+  /* ── EMPTY STATES ── */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: #2a4a6a; line-height: 2;
+  }
+  .empty .icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0a1520; border: 1px solid #1a3050;
+    color: #e0eeff; padding: 10px 16px;
+    border-radius: 4px; font-size: 12px;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+    z-index: 2000;
+  }
+  .toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { border-color: #00e07a; }
+  .toast.error { border-color: #ff4466; }
+
+  /* ── LOADING SPINNER ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid #1e3550;
+    border-top-color: #00aaff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ─── HEADER ─── -->
+  <div class="header">
+    <span class="logo">APEX<span class="accent">-1</span></span>
+    <span class="live-dot" id="liveDot"></span>
+    <div class="header-right">
+      <div class="label">PORTFOLIO</div>
+      <div class="value" id="totalValue">$0.00</div>
+    </div>
+    <button class="settings-btn" onclick="openSettings()">⚙</button>
+  </div>
+
+  <!-- ─── TABS ─── -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('signals')">SIGNALS</div>
+    <div class="tab" onclick="switchTab('markets')">MARKETS</div>
+    <div class="tab" onclick="switchTab('portfolio')">PORTFOLIO</div>
+    <div class="tab" onclick="switchTab('log')">LOG</div>
+  </div>
+
+  <!-- ─── CONTENT ─── -->
+  <div class="content">
+
+    <!-- SIGNALS TAB -->
+    <div class="view active" id="view-signals">
+      <button class="ai-cta" id="aiBtn" onclick="runAIAnalysis()">⚡ RUN AI ANALYSIS</button>
+      <div id="aiOutput"></div>
+      <div id="signalsList"></div>
+    </div>
+
+    <!-- MARKETS TAB -->
+    <div class="view" id="view-markets">
+      <div id="marketsList"></div>
+    </div>
+
+    <!-- PORTFOLIO TAB -->
+    <div class="view" id="view-portfolio">
+      <div id="portfolioContent"></div>
+    </div>
+
+    <!-- LOG TAB -->
+    <div class="view" id="view-log">
+      <div id="logList"></div>
+    </div>
+
+  </div>
+
+  <!-- ─── BOTTOM BAR ─── -->
+  <div class="bottom-bar">
+    <div class="bot-status">
+      <span class="live-dot" id="botDot" style="background:#5a5a5a;box-shadow:none;"></span>
+      <span id="botStatus">AUTO-TRADING OFF</span>
+    </div>
+    <button class="bot-toggle" id="botToggle" onclick="toggleBot()">▶ AUTO-START</button>
+  </div>
+
+  <!-- ─── SETTINGS MODAL ─── -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <h2>⚙ SETTINGS</h2>
+      <div class="warn-box">
+        ⚠ Your API keys are stored ONLY on this device (local storage).
+        They are never sent anywhere except directly to Binance/Anthropic APIs.
+      </div>
+
+      <label>BINANCE API KEY</label>
+      <input type="text" id="binanceKey" placeholder="Paste your Binance API Key" autocomplete="off" />
+      <div class="help-text">From Binance → API Management. Enable SPOT trading only. NEVER enable withdrawals.</div>
+
+      <label>BINANCE SECRET KEY</label>
+      <input type="password" id="binanceSecret" placeholder="Paste your Binance Secret" autocomplete="off" />
+
+      <label>ANTHROPIC API KEY</label>
+      <input type="password" id="anthropicKey" placeholder="sk-ant-..." autocomplete="off" />
+      <div class="help-text">Get from console.anthropic.com → API Keys</div>
+
+      <label>MAX % PER TRADE</label>
+      <input type="number" id="maxPct" placeholder="15" min="5" max="50" />
+      <div class="help-text">Max % of free USDT to spend per single trade (recommended: 10–20%)</div>
+
+      <label>STOP-LOSS %</label>
+      <input type="number" id="stopLoss" placeholder="6" min="2" max="20" />
+
+      <label>TAKE-PROFIT %</label>
+      <input type="number" id="takeProfit" placeholder="12" min="3" max="50" />
+
+      <label>AUTO-TRADE INTERVAL (MINUTES)</label>
+      <input type="number" id="interval" placeholder="30" min="5" max="240" />
+
+      <div class="modal-btns">
+        <button class="modal-btn cancel" onclick="closeSettings()">CANCEL</button>
+        <button class="modal-btn primary" onclick="saveSettings()">SAVE</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <button class="modal-btn danger" style="width:100%;" onclick="clearAllData()">🗑 CLEAR ALL DATA</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  APEX-1 Mobile Trading Agent
+//  Connects to Binance + Claude AI for live crypto trading
+// ════════════════════════════════════════════════════════════
+
+const COINS = [
+  { sym: "BTCUSDT",  short: "BTC",  name: "Bitcoin",   color: "#F7931A" },
+  { sym: "ETHUSDT",  short: "ETH",  name: "Ethereum",  color: "#627EEA" },
+  { sym: "BNBUSDT",  short: "BNB",  name: "BNB",       color: "#F3BA2F" },
+  { sym: "SOLUSDT",  short: "SOL",  name: "Solana",    color: "#9945FF" },
+  { sym: "XRPUSDT",  short: "XRP",  name: "XRP",       color: "#00AAE4" },
+  { sym: "ADAUSDT",  short: "ADA",  name: "Cardano",   color: "#0033AD" },
+  { sym: "DOGEUSDT", short: "DOGE", name: "Dogecoin",  color: "#C2A633" },
+  { sym: "AVAXUSDT", short: "AVAX", name: "Avalanche", color: "#E84142" },
+  { sym: "PAXGUSDT", short: "GOLD", name: "PAX Gold",  color: "#D4AF37" },
+];
+
+// ── State ───────────────────────────────────────────────────
+const state = {
+  prices: {},          // ticker24hr data
+  klines: {},          // historical candles
+  account: null,       // binance account info
+  openOrders: [],
+  signals: [],         // AI signals
+  aiOutput: null,
+  logs: [],
+  trades: [],          // trade journal for "learning"
+  autoTrading: false,
+  autoTimer: null,
+  lastAnalysis: null,
+};
+
+const settings = {
+  binanceKey:    "",
+  binanceSecret: "",
+  anthropicKey:  "",
+  maxPct:        15,
+  stopLoss:      6,
+  takeProfit:    12,
+  interval:      30,
+};
+
+const log = (type, msg) => {
+  const entry = { t: new Date().toLocaleTimeString("en-GB",{hour12:false}), type, msg };
+  state.logs.unshift(entry);
+  if (state.logs.length > 200) state.logs.length = 200;
+  saveLogs();
+  if (currentTab === "log") renderLog();
+};
+
+// ════════════════════════════════════════════════════════════
+//  STORAGE
+// ════════════════════════════════════════════════════════════
+
+const STORAGE_KEY = "apex1_v1";
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY + "_settings") || "{}");
+    Object.assign(settings, s);
+  } catch {}
+  try {
+    state.trades = JSON.parse(localStorage.getItem(STORAGE_KEY + "_trades") || "[]");
+  } catch {}
+  try {
+    state.logs = JSON.parse(localStorage.getItem(STORAGE_KEY + "_logs") || "[]");
+  } catch {}
+}
+function saveSettings() {
+  const s = {
+    binanceKey:    document.getElementById("binanceKey").value.trim(),
+    binanceSecret: document.getElementById("binanceSecret").value.trim(),
+    anthropicKey:  document.getElementById("anthropicKey").value.trim(),
+    maxPct:        parseFloat(document.getElementById("maxPct").value)    || 15,
+    stopLoss:      parseFloat(document.getElementById("stopLoss").value)  || 6,
+    takeProfit:    parseFloat(document.getElementById("takeProfit").value)|| 12,
+    interval:      parseInt(document.getElementById("interval").value)    || 30,
+  };
+  Object.assign(settings, s);
+  localStorage.setItem(STORAGE_KEY + "_settings", JSON.stringify(settings));
+  closeSettings();
+  toast("Settings saved", "success");
+  log("info", "Settings updated");
+  init();
+}
+function saveTrades() {
+  localStorage.setItem(STORAGE_KEY + "_trades", JSON.stringify(state.trades.slice(-100)));
+}
+function saveLogs() {
+  localStorage.setItem(STORAGE_KEY + "_logs", JSON.stringify(state.logs.slice(0, 200)));
+}
+function clearAllData() {
+  if (!confirm("Erase all settings, API keys, trades and logs?")) return;
+  localStorage.removeItem(STORAGE_KEY + "_settings");
+  localStorage.removeItem(STORAGE_KEY + "_trades");
+  localStorage.removeItem(STORAGE_KEY + "_logs");
+  Object.assign(settings, { binanceKey:"",binanceSecret:"",anthropicKey:"",maxPct:15,stopLoss:6,takeProfit:12,interval:30 });
+  state.trades = [];
+  state.logs = [];
+  closeSettings();
+  toast("All data cleared", "success");
+  init();
+}
+
+// ════════════════════════════════════════════════════════════
+//  BINANCE — Public Data (no signing needed)
+// ════════════════════════════════════════════════════════════
+
+async function fetchPrices() {
+  try {
+    const res = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+    if (!res.ok) throw new Error("Binance API " + res.status);
+    const data = await res.json();
+    const map = {};
+    data.filter(t => COINS.find(c => c.sym === t.symbol))
+        .forEach(t => map[t.symbol] = t);
+    state.prices = map;
+    document.getElementById("liveDot").classList.remove("red");
+    if (currentTab === "markets") renderMarkets();
+    if (currentTab === "signals") refreshHeader();
+    refreshHeader();
+  } catch (e) {
+    document.getElementById("liveDot").classList.add("red");
+    log("err", `Price fetch error: ${e.message}`);
+  }
+}
+
+async function fetchKlines(sym) {
+  try {
+    const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&limit=24`);
+    const data = await res.json();
+    state.klines[sym] = data.map(k => parseFloat(k[4]));
+  } catch (e) {}
+}
+
+// ════════════════════════════════════════════════════════════
+//  BINANCE — Signed (Private) Calls
+//  HMAC-SHA256 signing in pure JavaScript using Web Crypto API
+// ════════════════════════════════════════════════════════════
+
+async function hmacSha256Hex(key, msg) {
+  const enc = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw", enc.encode(key),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", cryptoKey, enc.encode(msg));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+async function binanceSigned(method, path, params = {}) {
+  if (!settings.binanceKey || !settings.binanceSecret) {
+    throw new Error("Binance API keys not set. Open settings.");
+  }
+  // Get server time to avoid timestamp errors
+  let serverTime;
+  try {
+    const r = await fetch("https://api.binance.com/api/v3/time");
+    serverTime = (await r.json()).serverTime;
+  } catch {
+    serverTime = Date.now();
+  }
+  params.timestamp = serverTime;
+  params.recvWindow = 60000;
+  const queryString = Object.entries(params)
+    .map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join("&");
+  const signature = await hmacSha256Hex(settings.binanceSecret, queryString);
+  const url = `https://api.binance.com${path}?${queryString}&signature=${signature}`;
+  const res = await fetch(url, {
+    method,
+    headers: { "X-MBX-APIKEY": settings.binanceKey },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.msg || `Binance error ${res.status}`);
+  }
+  return data;
+}
+
+async function fetchAccount() {
+  if (!settings.binanceKey) return;
+  try {
+    state.account = await binanceSigned("GET", "/api/v3/account");
+    log("info", "Binance account synced");
+    if (currentTab === "portfolio") renderPortfolio();
+    refreshHeader();
+  } catch (e) {
+    log("err", `Account error: ${e.message}`);
+    toast(`Binance: ${e.message}`, "error");
+  }
+}
+
+async function placeOrder(symbol, side, quoteQty) {
+  // side = BUY or SELL. quoteQty is in USDT (for BUY).
+  // For SELL we use quantity (base asset).
+  log("info", `Placing ${side} order: ${symbol} ${quoteQty} ${side === "BUY" ? "USDT" : "units"}`);
+  try {
+    const params = { symbol, side, type: "MARKET" };
+    if (side === "BUY") {
+      params.quoteOrderQty = quoteQty.toFixed(2);
+    } else {
+      // For SELL, find lot size step
+      const info = await fetch(`https://api.binance.com/api/v3/exchangeInfo?symbol=${symbol}`).then(r=>r.json());
+      const lot = info.symbols[0].filters.find(f => f.filterType === "LOT_SIZE");
+      const step = parseFloat(lot.stepSize);
+      const decimals = Math.max(0, -Math.floor(Math.log10(step)));
+      params.quantity = (Math.floor(quoteQty / step) * step).toFixed(decimals);
+    }
+    const order = await binanceSigned("POST", "/api/v3/order", params);
+    log(side.toLowerCase(), `✅ ${side} ${symbol} filled. Order #${order.orderId}`);
+
+    // Record in trade journal
+    const fillPrice = parseFloat(order.fills?.[0]?.price || state.prices[symbol]?.lastPrice || 0);
+    const fillQty   = parseFloat(order.executedQty || 0);
+    state.trades.unshift({
+      time: Date.now(),
+      side, symbol,
+      price: fillPrice, qty: fillQty,
+      total: fillPrice * fillQty,
+      orderId: order.orderId,
+    });
+    saveTrades();
+    fetchAccount();
+    return order;
+  } catch (e) {
+    log("err", `Order failed: ${e.message}`);
+    toast(`Order failed: ${e.message}`, "error");
+    return null;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  CLAUDE AI — Decision Engine
+// ════════════════════════════════════════════════════════════
+
+async function runAIAnalysis() {
+  if (!settings.anthropicKey) {
+    toast("Set Anthropic key in settings", "error");
+    openSettings();
+    return;
+  }
+  const btn = document.getElementById("aiBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>ANALYZING...';
+
+  log("ai", "AI analysis started — fetching market context");
+
+  // Build market snapshot
+  const market = COINS.map(c => {
+    const d = state.prices[c.sym];
+    if (!d) return null;
+    const p = parseFloat(d.lastPrice);
+    const chg = parseFloat(d.priceChangePercent);
+    const vol = parseFloat(d.quoteVolume) / 1e6;
+    const h = parseFloat(d.highPrice), l = parseFloat(d.lowPrice);
+    return `${c.short}: $${p.toFixed(p<1?5:2)} | 24h: ${chg>=0?"+":""}${chg.toFixed(2)}% | Vol: $${vol.toFixed(1)}M | H:$${h.toFixed(p<1?4:2)} L:$${l.toFixed(p<1?4:2)}`;
+  }).filter(Boolean).join("\n");
+
+  // Portfolio summary
+  let usdtFree = 0, holdings = "None";
+  if (state.account) {
+    const usdt = state.account.balances.find(b => b.asset === "USDT");
+    usdtFree = usdt ? parseFloat(usdt.free) : 0;
+    const heldList = state.account.balances
+      .filter(b => parseFloat(b.free) + parseFloat(b.locked) > 0 && b.asset !== "USDT")
+      .map(b => {
+        const sym = b.asset + "USDT";
+        const p = state.prices[sym] ? parseFloat(state.prices[sym].lastPrice) : 0;
+        const total = parseFloat(b.free) + parseFloat(b.locked);
+        return `${b.asset}: ${total.toFixed(6)} (≈$${(total * p).toFixed(2)})`;
+      });
+    if (heldList.length) holdings = heldList.join(", ");
+  }
+
+  // Past trade history (the "learning" part - AI sees its own track record)
+  const recentTrades = state.trades.slice(0, 10).map(t => {
+    const date = new Date(t.time).toLocaleString("en-GB");
+    return `${date} | ${t.side} ${t.symbol} | qty: ${t.qty} | price: $${t.price}`;
+  }).join("\n") || "No previous trades";
+
+  const prompt = `You are APEX-1, a professional crypto trading AI for Binance.
+
+═══ LIVE MARKET DATA ═══
+${market}
+
+═══ USER PORTFOLIO ═══
+Free USDT: $${usdtFree.toFixed(2)}
+Holdings: ${holdings}
+
+═══ YOUR RECENT TRADE HISTORY (review for patterns) ═══
+${recentTrades}
+
+═══ INSTRUCTIONS ═══
+1. Use web_search to check: latest crypto news, fear & greed index, BTC dominance, market sentiment.
+2. Analyze the live data above with technical reasoning.
+3. Reflect briefly on your past trades — were they good entries? Anything to do differently?
+4. Produce 1-3 high-conviction trade signals (or none, if no good setups).
+
+═══ TRADING RULES ═══
+- Max ${settings.maxPct}% of free USDT per BUY trade (allocation field)
+- Min trade: $11 USDT
+- Don't BUY a coin already held heavily (>${settings.maxPct*2}% of portfolio)
+- For SELL: only if user already holds that coin
+- Be selective — quality over quantity. Better to do nothing than force trades.
+
+═══ OUTPUT FORMAT (STRICT JSON, no markdown) ═══
+{
+  "headline": "one-line market summary <80 chars",
+  "sentiment": "BULLISH" | "BEARISH" | "NEUTRAL",
+  "analysis": "3-4 sentences with specific prices and reasoning",
+  "reflection": "1-2 sentences reviewing past trades (or 'No history yet')",
+  "risk_level": "LOW" | "MEDIUM" | "HIGH",
+  "signals": [
+    {
+      "symbol": "BTCUSDT",
+      "action": "BUY" | "SELL" | "WATCH",
+      "strength": "STRONG" | "MODERATE" | "WEAK",
+      "allocation": 0.15,
+      "entry": 65000,
+      "target": 70000,
+      "stop": 62000,
+      "reason": "concise reason <100 chars"
+    }
+  ]
+}`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": settings.anthropicKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    let raw = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    raw = raw.replace(/```json|```/g, "").trim();
+    const s = raw.indexOf("{"), e = raw.lastIndexOf("}") + 1;
+    const parsed = JSON.parse(raw.slice(s, e));
+
+    state.aiOutput = parsed;
+    state.signals = parsed.signals || [];
+    state.lastAnalysis = Date.now();
+
+    log("ai", `Analysis: ${parsed.sentiment} | Risk: ${parsed.risk_level} | ${state.signals.length} signals`);
+    parsed.signals?.forEach(sg => log(sg.action.toLowerCase(), `${sg.action} ${sg.symbol}: ${sg.reason}`));
+
+    renderSignals();
+
+    // Auto-execute if auto-trading is on
+    if (state.autoTrading && state.signals.length > 0) {
+      await autoExecuteSignals();
+    }
+
+  } catch (e) {
+    log("err", `AI error: ${e.message}`);
+    toast(`AI: ${e.message}`, "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "⚡ RUN AI ANALYSIS";
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  AUTO-TRADING
+// ════════════════════════════════════════════════════════════
+
+async function autoExecuteSignals() {
+  if (!state.account) {
+    log("warn", "Cannot auto-trade — no Binance account connected");
+    return;
+  }
+  const usdt = state.account.balances.find(b => b.asset === "USDT");
+  let usdtFree = usdt ? parseFloat(usdt.free) : 0;
+
+  for (const sig of state.signals) {
+    if (sig.action === "WATCH") continue;
+    if (sig.strength === "WEAK") continue; // skip weak signals on auto
+
+    if (sig.action === "BUY") {
+      const spend = Math.min(usdtFree * sig.allocation, usdtFree * (settings.maxPct/100));
+      if (spend < 11) { log("warn", `Skip BUY ${sig.symbol} — amount too small`); continue; }
+      await placeOrder(sig.symbol, "BUY", spend);
+      usdtFree -= spend;
+      await new Promise(r => setTimeout(r, 1500));
+    } else if (sig.action === "SELL") {
+      const coin = sig.symbol.replace("USDT","");
+      const bal = state.account.balances.find(b => b.asset === coin);
+      if (!bal || parseFloat(bal.free) < 0.0001) { log("warn", `Skip SELL ${sig.symbol} — no balance`); continue; }
+      const qty = parseFloat(bal.free) * (sig.allocation || 1.0);
+      await placeOrder(sig.symbol, "SELL", qty);
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+}
+
+async function checkStopLossTakeProfit() {
+  // Iterate through trade book, check if any position should be closed
+  if (!state.account) return;
+  const buyTrades = state.trades.filter(t => t.side === "BUY").slice(0, 20);
+
+  for (const trade of buyTrades) {
+    const sym = trade.symbol;
+    const coin = sym.replace("USDT","");
+    const bal = state.account.balances.find(b => b.asset === coin);
+    if (!bal || parseFloat(bal.free) < 0.0001) continue;
+
+    const currPrice = parseFloat(state.prices[sym]?.lastPrice || 0);
+    if (!currPrice) continue;
+
+    const pnlPct = ((currPrice - trade.price) / trade.price) * 100;
+
+    if (pnlPct <= -settings.stopLoss) {
+      log("warn", `🔴 STOP-LOSS triggered: ${sym} ${pnlPct.toFixed(2)}%`);
+      await placeOrder(sym, "SELL", parseFloat(bal.free));
+    } else if (pnlPct >= settings.takeProfit) {
+      log("info", `🟢 TAKE-PROFIT triggered: ${sym} +${pnlPct.toFixed(2)}%`);
+      await placeOrder(sym, "SELL", parseFloat(bal.free));
+    }
+  }
+}
+
+function toggleBot() {
+  if (!settings.binanceKey || !settings.anthropicKey) {
+    toast("Set API keys first", "error");
+    openSettings();
+    return;
+  }
+  state.autoTrading = !state.autoTrading;
+  const btn = document.getElementById("botToggle");
+  const dot = document.getElementById("botDot");
+  const status = document.getElementById("botStatus");
+
+  if (state.autoTrading) {
+    btn.textContent = "⏹ STOP";
+    btn.classList.add("on");
+    dot.style.background = "#00e07a";
+    dot.style.boxShadow = "0 0 8px #00e07a";
+    status.textContent = `AUTO-TRADING ON (every ${settings.interval}min)`;
+    log("info", `🤖 Auto-trading ENABLED — AI will analyze every ${settings.interval} minutes`);
+    runAIAnalysis(); // First run immediately
+    state.autoTimer = setInterval(async () => {
+      await checkStopLossTakeProfit();
+      await runAIAnalysis();
+    }, settings.interval * 60 * 1000);
+  } else {
+    btn.textContent = "▶ AUTO-START";
+    btn.classList.remove("on");
+    dot.style.background = "#5a5a5a";
+    dot.style.boxShadow = "none";
+    status.textContent = "AUTO-TRADING OFF";
+    log("warn", "Auto-trading DISABLED");
+    if (state.autoTimer) clearInterval(state.autoTimer);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDERING
+// ════════════════════════════════════════════════════════════
+
+let currentTab = "signals";
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  event.target.classList.add("active");
+  document.getElementById(`view-${tab}`).classList.add("active");
+
+  if (tab === "markets") renderMarkets();
+  if (tab === "portfolio") renderPortfolio();
+  if (tab === "log") renderLog();
+  if (tab === "signals") renderSignals();
+}
+
+function refreshHeader() {
+  if (!state.account) {
+    document.getElementById("totalValue").textContent = "—";
+    return;
+  }
+  let total = 0;
+  for (const b of state.account.balances) {
+    const amt = parseFloat(b.free) + parseFloat(b.locked);
+    if (amt < 0.0001) continue;
+    if (b.asset === "USDT") total += amt;
+    else {
+      const sym = b.asset + "USDT";
+      const p = state.prices[sym] ? parseFloat(state.prices[sym].lastPrice) : 0;
+      total += amt * p;
+    }
+  }
+  document.getElementById("totalValue").textContent = `$${total.toFixed(2)}`;
+}
+
+function spark(arr, color) {
+  if (!arr || arr.length < 2) return "";
+  const w = 60, h = 28;
+  const mn = Math.min(...arr), mx = Math.max(...arr), rng = mx - mn || 1;
+  const pts = arr.map((v, i) => `${(i/(arr.length-1))*w},${h - ((v-mn)/rng)*(h*0.85) - h*0.075}`).join(" ");
+  return `<svg width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/></svg>`;
+}
+
+function renderMarkets() {
+  const html = COINS.map(c => {
+    const d = state.prices[c.sym];
+    if (!d) return `<div class="coin-card"><div class="coin-icon" style="background:${c.color}">${c.short[0]}</div><div class="coin-info"><div class="name">${c.short}</div><div class="full">${c.name}</div></div><div></div><div class="coin-price"><div class="p">—</div></div></div>`;
+    const p = parseFloat(d.lastPrice);
+    const chg = parseFloat(d.priceChangePercent);
+    const cls = chg >= 0 ? "pos" : "neg";
+    return `
+      <div class="coin-card">
+        <div class="coin-icon" style="background:${c.color}">${c.short[0]}</div>
+        <div class="coin-info">
+          <div class="name">${c.short}</div>
+          <div class="full">${c.name}</div>
+        </div>
+        <div class="coin-spark">${spark(state.klines[c.sym] || [], c.color)}</div>
+        <div class="coin-price">
+          <div class="p">$${p < 1 ? p.toFixed(5) : p.toLocaleString("en", {maximumFractionDigits: 2})}</div>
+          <div class="c ${cls}">${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%</div>
+        </div>
+      </div>`;
+  }).join("");
+  document.getElementById("marketsList").innerHTML = html;
+}
+
+function renderSignals() {
+  const ai = state.aiOutput;
+  let html = "";
+
+  if (ai) {
+    const sent = ai.sentiment;
+    const sentColor = sent === "BULLISH" ? "#00e07a" : sent === "BEARISH" ? "#ff4466" : "#ffaa00";
+    const risk = ai.risk_level;
+    const riskColor = risk === "LOW" ? "#00e07a" : risk === "HIGH" ? "#ff4466" : "#ffaa00";
+    html += `
+      <div class="ai-card">
+        <div class="headline">${ai.headline}</div>
+        <div class="meta">
+          <span class="badge" style="color:${sentColor}">${sent}</span>
+          <span class="badge" style="color:${riskColor}">RISK: ${risk}</span>
+        </div>
+        <div class="analysis">${ai.analysis}</div>
+        ${ai.reflection ? `<div class="analysis" style="margin-top:8px;border-left-color:#7b9fff44;color:#7b9fff;"><b>📔 Self-review:</b> ${ai.reflection}</div>` : ""}
+      </div>
+    `;
+  }
+
+  if (state.signals.length === 0) {
+    if (!ai) {
+      html += `<div class="empty"><div class="icon">🤖</div><div>No AI signals yet</div><div style="font-size:11px;margin-top:8px;">Tap the button above to analyze the market</div></div>`;
+    } else {
+      html += `<div class="empty"><div>🤝 No trades recommended right now</div><div style="font-size:11px;margin-top:8px;">AI is in HOLD mode</div></div>`;
+    }
+  } else {
+    html += state.signals.map((sg,i) => {
+      const cls = sg.action.toLowerCase();
+      const ac = cls === "buy" ? "#00e07a" : cls === "sell" ? "#ff4466" : "#ffaa00";
+      const coin = COINS.find(c => c.sym === sg.symbol);
+      return `
+        <div class="signal-card ${cls}">
+          <div class="signal-head">
+            <div class="ticker">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${coin?.color || ac};margin-right:6px;vertical-align:middle"></span>
+              ${coin?.short || sg.symbol}
+            </div>
+            <div class="signal-tags">
+              <span class="badge" style="color:${ac}">${sg.action}</span>
+              <span class="badge" style="color:#5a8aaa">${sg.strength}</span>
+            </div>
+          </div>
+          <div class="signal-reason">${sg.reason}</div>
+          <div class="signal-levels">
+            <div class="lvl"><div class="l">ENTRY</div><div class="v" style="color:#a0c8e8">$${Number(sg.entry).toLocaleString()}</div></div>
+            <div class="lvl"><div class="l">TARGET</div><div class="v pos">$${Number(sg.target).toLocaleString()}</div></div>
+            <div class="lvl"><div class="l">STOP</div><div class="v neg">$${Number(sg.stop).toLocaleString()}</div></div>
+          </div>
+          ${sg.action !== "WATCH" ? `<button class="trade-btn ${cls}" onclick="confirmTrade(${i})">${sg.action} NOW (${(sg.allocation*100).toFixed(0)}%)</button>` : ""}
+        </div>`;
+    }).join("");
+  }
+  document.getElementById("aiOutput").innerHTML = html;
+}
+
+async function confirmTrade(idx) {
+  const sg = state.signals[idx];
+  if (!sg) return;
+  if (!state.account) {
+    toast("Connect Binance first (settings)", "error");
+    return;
+  }
+  const usdt = state.account.balances.find(b => b.asset === "USDT");
+  const usdtFree = usdt ? parseFloat(usdt.free) : 0;
+
+  let confirmMsg;
+  if (sg.action === "BUY") {
+    const spend = Math.min(usdtFree * sg.allocation, usdtFree * (settings.maxPct/100));
+    if (spend < 11) { toast("Insufficient USDT", "error"); return; }
+    confirmMsg = `BUY ${sg.symbol}\nSpend: $${spend.toFixed(2)} USDT\n\nProceed?`;
+    if (!confirm(confirmMsg)) return;
+    await placeOrder(sg.symbol, "BUY", spend);
+  } else if (sg.action === "SELL") {
+    const coin = sg.symbol.replace("USDT","");
+    const bal = state.account.balances.find(b => b.asset === coin);
+    if (!bal || parseFloat(bal.free) < 0.0001) { toast(`No ${coin} balance`, "error"); return; }
+    const qty = parseFloat(bal.free) * (sg.allocation || 1.0);
+    confirmMsg = `SELL ${sg.symbol}\nQty: ${qty.toFixed(6)} ${coin}\n\nProceed?`;
+    if (!confirm(confirmMsg)) return;
+    await placeOrder(sg.symbol, "SELL", qty);
+  }
+}
+
+function renderPortfolio() {
+  const c = document.getElementById("portfolioContent");
+  if (!state.account) {
+    c.innerHTML = `<div class="empty"><div class="icon">🔌</div><div>No Binance connection</div><div style="font-size:11px;margin-top:8px;">Add API keys in settings to see your portfolio</div><button class="ai-cta" style="margin-top:16px;" onclick="openSettings()">⚙ OPEN SETTINGS</button></div>`;
+    return;
+  }
+  const usdt = state.account.balances.find(b => b.asset === "USDT");
+  const usdtTotal = usdt ? parseFloat(usdt.free) + parseFloat(usdt.locked) : 0;
+  const usdtFree  = usdt ? parseFloat(usdt.free) : 0;
+
+  let total = usdtTotal;
+  const holdings = [];
+  for (const b of state.account.balances) {
+    const amt = parseFloat(b.free) + parseFloat(b.locked);
+    if (amt < 0.0001 || b.asset === "USDT") continue;
+    const sym = b.asset + "USDT";
+    const p = state.prices[sym] ? parseFloat(state.prices[sym].lastPrice) : 0;
+    const value = amt * p;
+    if (value < 0.5) continue;
+    total += value;
+
+    // Find avg cost from trades
+    const buys = state.trades.filter(t => t.symbol === sym && t.side === "BUY");
+    let avgCost = 0;
+    if (buys.length) {
+      const totalSpent = buys.reduce((s,t) => s + t.total, 0);
+      const totalBought = buys.reduce((s,t) => s + t.qty, 0);
+      avgCost = totalSpent / totalBought;
+    }
+    const pnl = avgCost > 0 ? ((p - avgCost) / avgCost) * 100 : 0;
+    const coin = COINS.find(cc => cc.sym === sym);
+
+    holdings.push(`
+      <div class="holding">
+        <div class="coin-icon" style="background:${coin?.color || '#444'}">${b.asset[0]}</div>
+        <div class="qty">${b.asset} <span class="sub">${amt.toFixed(6)}</span></div>
+        <div class="val">
+          $${value.toFixed(2)}
+          ${avgCost > 0 ? `<div class="pct ${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}${pnl.toFixed(2)}%</div>` : ''}
+        </div>
+      </div>`);
+  }
+
+  const tradeCount = state.trades.length;
+
+  c.innerHTML = `
+    <div class="pf-summary">
+      <div class="label">TOTAL PORTFOLIO VALUE</div>
+      <div class="total">$${total.toFixed(2)}</div>
+      <div class="row"><span>Free USDT</span><span class="v">$${usdtFree.toFixed(2)}</span></div>
+      <div class="row"><span>Holdings Value</span><span class="v">$${(total - usdtTotal).toFixed(2)}</span></div>
+      <div class="row"><span>Total Trades</span><span class="v">${tradeCount}</span></div>
+    </div>
+    <div style="margin-bottom:8px;color:#3a5a7a;font-size:10px;letter-spacing:2px;">HOLDINGS</div>
+    ${holdings.length ? holdings.join("") : '<div class="empty" style="padding:20px;">No coin holdings</div>'}
+    <div style="margin:16px 0 8px;color:#3a5a7a;font-size:10px;letter-spacing:2px;">RECENT TRADES</div>
+    ${state.trades.slice(0, 10).map(t => `
+      <div class="holding">
+        <div class="coin-icon" style="background:${t.side==='BUY'?'#00e07a':'#ff4466'};color:#000">${t.side[0]}</div>
+        <div class="qty">${t.symbol} <span class="sub">${new Date(t.time).toLocaleString("en-GB")}</span></div>
+        <div class="val">$${t.total.toFixed(2)}<div class="pct" style="color:#3a5a7a">${t.qty.toFixed(6)}</div></div>
+      </div>`).join("") || '<div class="empty" style="padding:20px;">No trades yet</div>'}
+  `;
+}
+
+function renderLog() {
+  document.getElementById("logList").innerHTML =
+    state.logs.length ? state.logs.slice(0, 100).map(l => `
+      <div class="log-entry ${l.type}">
+        <span class="time">${l.t}</span>
+        <span class="tag">${l.type.toUpperCase()}</span>
+        <span class="msg">${l.msg}</span>
+      </div>
+    `).join("") : `<div class="empty"><div class="icon">📋</div><div>No log entries yet</div></div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ════════════════════════════════════════════════════════════
+
+function openSettings() {
+  document.getElementById("binanceKey").value    = settings.binanceKey;
+  document.getElementById("binanceSecret").value = settings.binanceSecret;
+  document.getElementById("anthropicKey").value  = settings.anthropicKey;
+  document.getElementById("maxPct").value        = settings.maxPct;
+  document.getElementById("stopLoss").value      = settings.stopLoss;
+  document.getElementById("takeProfit").value    = settings.takeProfit;
+  document.getElementById("interval").value      = settings.interval;
+  document.getElementById("settingsModal").classList.add("show");
+}
+function closeSettings() {
+  document.getElementById("settingsModal").classList.remove("show");
+}
+function toast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+
+async function init() {
+  log("info", "APEX-1 starting...");
+  await fetchPrices();
+  for (const c of COINS) await fetchKlines(c.sym);
+  if (settings.binanceKey && settings.binanceSecret) {
+    await fetchAccount();
+  } else {
+    log("warn", "Binance keys not set — open settings to connect");
+  }
+  renderMarkets();
+  renderSignals();
+  renderPortfolio();
+
+  // Refresh prices every 15s
+  setInterval(fetchPrices, 15000);
+  // Refresh account every minute
+  setInterval(() => { if (settings.binanceKey) fetchAccount(); }, 60000);
+}
+
+loadSettings();
+init();
+
+// service worker disabled in single-file mode
+
+</script>
+</body>
+</html>
